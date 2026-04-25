@@ -1,0 +1,114 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'motion/react';
+
+export const PortalLoginPage = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    // Simulate login for now as we don't have a backend auth yet
+    setTimeout(() => {
+      setIsLoading(false);
+      alert('Clinical Portal access is currently restricted to authorized personnel only. Please contact the administrator.');
+    }, 1500);
+  };
+
+  return (
+    <main className="min-h-screen py-32 bg-black relative overflow-hidden flex flex-col items-center justify-center">
+      {/* Background accents */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden -z-10">
+        <div className="absolute top-1/4 -left-20 w-96 h-96 bg-primary/10 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-waiting-gold/5 rounded-full blur-[120px]"></div>
+      </div>
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="w-full max-w-md px-6"
+      >
+        <div className="text-center mb-10">
+          <div className="w-24 h-24 mx-auto mb-6">
+            <img src="https://ik.imagekit.io/senvetcare/Logo/Logo%20Trans.webp" alt="SenVetCare" className="w-full h-full object-contain brightness-200 contrast-125" />
+          </div>
+          <h1 className="font-manrope font-bold text-3xl text-white mb-2 tracking-tight">Clinical Portal</h1>
+          <p className="font-inter text-zinc-600 text-[10px] uppercase font-bold tracking-[0.2em]">Secure Authentication Required</p>
+        </div>
+
+        <div className="bg-zinc-900/50 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-8 md:p-12 shadow-2xl">
+          <form onSubmit={handleLogin} className="space-y-8">
+            <div className="space-y-4">
+              <label className="block font-inter font-bold text-[10px] tracking-[0.2em] text-zinc-500 uppercase px-1" htmlFor="email">Work Email</label>
+              <input 
+                required
+                type="email" 
+                id="email" 
+                placeholder="doctor@senvetcare.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-black border border-white/5 rounded-2xl px-5 py-4 font-inter text-white placeholder:text-zinc-800 focus:outline-none focus:border-primary transition-all duration-300"
+              />
+            </div>
+            <div className="space-y-4">
+              <label className="block font-inter font-bold text-[10px] tracking-[0.2em] text-zinc-500 uppercase px-1" htmlFor="password">Security Password</label>
+              <input 
+                required
+                type="password" 
+                id="password" 
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-black border border-white/5 rounded-2xl px-5 py-4 font-inter text-white placeholder:text-zinc-800 focus:outline-none focus:border-primary transition-all duration-300"
+              />
+            </div>
+
+            <div className="flex items-center justify-between text-[10px] font-inter font-bold uppercase tracking-widest text-zinc-600">
+              <label className="flex items-center gap-2 cursor-pointer hover:text-white transition-colors">
+                <input type="checkbox" className="w-4 h-4 rounded border-white/10 bg-black" />
+                Keep Session
+              </label>
+              <a href="#" className="hover:text-primary transition-colors">Credential Recovery</a>
+            </div>
+
+            <button 
+              disabled={isLoading}
+              type="submit"
+              className="w-full bg-white text-black py-5 rounded-full font-inter font-bold text-xs tracking-[0.2em] uppercase hover:bg-primary hover:text-white transition-all duration-500 shadow-[0_20px_50px_rgba(255,255,255,0.05)] disabled:opacity-50 flex items-center justify-center gap-3 active:scale-[0.98]"
+            >
+              {isLoading ? (
+                <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+              ) : (
+                <>
+                  Authenticate
+                  <span className="material-symbols-outlined text-sm">lock_open</span>
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="mt-12 text-center">
+            <p className="font-inter text-[10px] text-zinc-700 font-bold uppercase tracking-widest leading-relaxed">
+              Protected by Sen-Memorial Protocol<br/>
+              Access Logs are strictly monitored
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-12 text-center">
+          <button 
+            onClick={() => navigate('/')}
+            className="font-inter text-[10px] font-bold text-zinc-600 hover:text-white uppercase tracking-[0.3em] transition-colors flex items-center justify-center gap-2 mx-auto"
+          >
+            <span className="material-symbols-outlined text-sm">arrow_back</span>
+            Return to Public Access
+          </button>
+        </div>
+      </motion.div>
+    </main>
+  );
+};

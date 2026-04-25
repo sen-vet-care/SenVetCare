@@ -1,52 +1,55 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #059669; 
-  --color-primary-container: #064e3b; 
+  --color-primary: #10B981; 
+  --color-primary-container: #065F46; 
   --color-on-primary: #ffffff;
-  --color-on-primary-container: #d1fae5; 
+  --color-on-primary-container: #D1FAE5; 
   
-  --color-secondary: #0f172a; 
-  --color-secondary-container: #f1f5f9;
+  --color-secondary: #0F172A; 
+  --color-secondary-container: #1E293B;
   --color-on-secondary: #ffffff;
-  --color-on-secondary-container: #0f172a;
+  --color-on-secondary-container: #F8FAFC;
 
-  --color-tertiary: #b45309; 
-  --color-tertiary-container: #fef3c7;
-  --color-on-tertiary: #ffffff;
-  --color-on-tertiary-container: #78350f;
+  --color-tertiary: #F59E0B; 
+  --color-tertiary-container: #78350F;
+  --color-on-tertiary: #111827;
+  --color-on-tertiary-container: #FEF3C7;
 
-  --color-waiting-gold: #d97706; 
-  --color-pharmacy-green: #059669; 
+  --color-waiting-gold: #FBBF24; 
+  --color-pharmacy-green: #34D399; 
   
-  --color-background: #f8fafc; 
-  --color-on-background: #0f172a;
-  --color-surface: #ffffff; 
-  --color-clinical-bg: #f8fafc;
+  --color-background: #020617; 
+  --color-on-background: #F8FAFC;
+  --color-surface: #0F172A; 
+  --color-clinical-bg: #020617;
 
-  --color-ink-depth: #0f172a; 
-  --color-on-surface: #1e293b; 
-  --color-on-surface-variant: #475569; 
-  --color-outline: #cbd5e1; 
-  --color-outline-variant: #f1f5f9; 
+  --color-ink-depth: #F8FAFC; 
+  --color-on-surface: #F1F5F9; 
+  --color-on-surface-variant: #94A3B8; 
+  --color-outline: #334155; 
+  --color-outline-variant: #1E293B; 
   
-  --color-surface-container-highest: #f1f5f9;
-  --color-surface-container-high: #f8fafc;
-  --color-surface-container: #f1f5f9;
-  --color-surface-container-low: #ffffff;
-  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-highest: #334155;
+  --color-surface-container-high: #1E293B;
+  --color-surface-container: #0F172A;
+  --color-surface-container-low: #0B0F19;
+  --color-surface-container-lowest: #020617;
 
-  --color-emergency-pulse: #dc2626; 
-  --color-error: #dc2626; 
-  --color-error-container: #fef2f2;
+  --color-emergency-pulse: #EF4444; 
+  --color-error: #F87171; 
+  --color-error-container: #7F1D1D;
   --color-on-error: #ffffff;
-  --color-on-error-container: #881337;
+  --color-on-error-container: #FEF2F2;
 
   --font-manrope: "Manrope", sans-serif;
   --font-inter: "Inter", sans-serif;
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-on-background font-inter antialiased bg-clinical-bg selection:bg-primary-container selection:text-on-primary-container;
   }
@@ -60,7 +63,7 @@
   .grayscale-card:hover {
     filter: grayscale(0%);
     transform: translateY(-4px);
-    box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.1), 0 8px 10px -6px rgba(5, 150, 105, 0.1);
+    box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.15), 0 8px 10px -6px rgba(16, 185, 129, 0.15);
   }
   .group:hover .grayscale-card {
     filter: grayscale(0%);
@@ -77,9 +80,9 @@
   }
 
   .glass-panel {
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(15, 23, 42, 0.7);
     backdrop-filter: blur(12px);
-    border: 0.5px solid rgba(255, 255, 255, 0.4);
+    border: 0.5px solid rgba(255, 255, 255, 0.1);
   }
   
   .hide-scrollbar::-webkit-scrollbar {
@@ -93,12 +96,56 @@
   .pulse-animation {
     animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
   }
+
+  .sanctuary-card {
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.5s ease;
+  }
+  .sanctuary-card:hover {
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(212, 175, 55, 0.05);
+  }
+
+  .text-gradient {
+    background: linear-gradient(to right, #10B981, #34D399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-gold {
+    background: linear-gradient(to right, #FBBF24, #FDE047);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .animate-breathe {
+    animation: breathe 8s ease-in-out infinite;
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.05); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
 @keyframes pulse-ring {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
-  70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(220, 38, 38, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
 }
 
 .material-symbols-outlined {

@@ -1,10 +1,29 @@
+import { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'motion/react';
+
 export const EmergencyBooking = () => {
+  const containerRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"]
+  });
+
+  const circle1Y = useTransform(scrollYProgress, [0, 1], [-100, 100]);
+  const circle2Y = useTransform(scrollYProgress, [0, 1], [100, -100]);
+
   return (
-    <section id="emergency" className="py-[100px] flex flex-col items-center justify-center relative overflow-hidden bg-gradient-to-b from-error-container/30 to-background">
+    <section ref={containerRef} id="emergency" className="py-[100px] flex flex-col items-center justify-center relative overflow-hidden bg-gradient-to-b from-error-container/30 to-background">
       {/* Decorative Background Elements */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-error-container/40 rounded-full blur-3xl -z-10 mix-blend-multiply"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-tertiary-fixed/30 rounded-full blur-3xl -z-10 mix-blend-multiply"></div>
+      <motion.div 
+        style={{ y: circle1Y }}
+        className="absolute top-1/4 left-1/4 w-96 h-96 bg-error-container/40 rounded-full blur-3xl -z-10 mix-blend-multiply"
+      ></motion.div>
+      <motion.div 
+        style={{ y: circle2Y }}
+        className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-tertiary-fixed/30 rounded-full blur-3xl -z-10 mix-blend-multiply"
+      ></motion.div>
       
+      {/* ... rest of the content */}
       <div className="w-full max-w-[1280px] mx-auto px-6 md:px-8 relative z-10 flex flex-col items-center text-center mt-12">
         <div className="mb-8 inline-flex items-center justify-center p-4 bg-error-container rounded-full text-error">
             <span className="material-symbols-outlined text-5xl" style={{ fontVariationSettings: "'FILL' 1" }}>medical_services</span>
@@ -16,7 +35,7 @@ export const EmergencyBooking = () => {
 
         {/* Large Pulsing CTA */}
         <div className="relative group cursor-pointer mb-16">
-            <a href="tel:+919871155162" className="relative z-10 flex flex-col items-center justify-center w-72 h-72 rounded-full bg-emergency-pulse text-on-error shadow-[0_20px_50px_-12px_rgba(190,18,60,0.5)] pulse-animation border-4 border-white/20 hover:scale-105 transition-transform duration-300">
+            <a href="tel:+919871155162" className="relative z-10 flex flex-col items-center justify-center w-72 h-72 rounded-full bg-emergency-pulse text-on-error shadow-[0_20px_50px_-12px_rgba(190,18,60,0.5)] pulse-animation border-4 border-on-surface/20 hover:scale-105 transition-transform duration-300">
                 <span className="material-symbols-outlined text-6xl mb-2" style={{ fontVariationSettings: "'FILL' 1" }}>call</span>
                 <span className="font-manrope font-semibold text-[24px] font-bold">Call Now</span>
                 <span className="font-inter text-[18px] mt-1 tracking-wider">9871155162</span>
@@ -62,28 +81,27 @@ export const EmergencyBooking = () => {
             </div>
 
             {/* Location Card */}
-            <div className="col-span-1 bg-surface rounded-3xl p-8 shadow-sm border border-outline-variant/30 flex flex-col h-full">
+            <div className="col-span-1 bg-surface rounded-3xl p-8 shadow-sm border border-outline-variant/30 flex flex-col h-full group hover:shadow-lg transition-all duration-300">
                 <div className="flex items-center gap-3 mb-6">
                     <div className="p-2 bg-primary-container rounded-2xl text-on-primary-container">
                         <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>location_on</span>
                     </div>
                     <h3 className="font-manrope font-semibold text-[24px] text-on-surface">Location</h3>
                 </div>
-                <p className="font-inter text-[16px] text-on-surface-variant mb-6 flex-grow">
-                    Dr. Tamal B. Sen Memorial Veterinary Clinic<br/>
-                    Kolkata, West Bengal
-                </p>
-                <div className="w-full h-32 rounded-2xl bg-surface-container-high overflow-hidden relative">
-                    <img 
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZvU3tlkvf4YrTyTwQFohRpUTc0lYXiT9BGWe9M1F_j54g_Dt7hXcSgx1CG6M_j3DoTDdhW2rS54m_3faU_1IP3YkqN9I_7_k9idvBkc9RPGTpGXmyTkp2LjoqsE45vZe0PpMvd8ivncGBEzQ5JV5An5dhLYUjP5iZvnpJNKINik_UlI_KDRXX18j5MwCGDbfDgaW8RxG2Yh_F5NZrnRS2M7qkwNMAgn9nOoa2KZflLo7ri_EE1IQS8KM0gSA0LFsBIrfuPP7NzRQ" 
-                        alt="Map view of clinic location" 
-                        className="w-full h-full object-cover opacity-80"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-3">
-                        <a href="#" className="font-inter font-bold text-[12px] tracking-widest text-white flex items-center gap-1 hover:underline">
-                            Get Directions <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                        </a>
-                    </div>
+                <div className="space-y-4">
+                  <p className="font-inter text-[16px] text-on-surface-variant leading-relaxed">
+                      Dr. Tamal B. Sen Memorial Veterinary Clinic<br/>
+                      69 Dr Suresh Sarkar Road, Entally-14<br/>
+                      Kolkata, West Bengal 700014
+                  </p>
+                  <a 
+                    href="https://maps.app.goo.gl/gGsjrYXAFf4AofRZA" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-primary font-bold uppercase text-[12px] tracking-widest hover:gap-3 transition-all"
+                  >
+                    Open in Maps <span className="material-symbols-outlined text-[16px]">north_east</span>
+                  </a>
                 </div>
             </div>
         </div>
