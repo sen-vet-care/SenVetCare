@@ -32,7 +32,7 @@ async function startServer() {
   app.post("/api/booking", async (req, res) => {
     const { firstName, lastName, email, phone, message } = req.body;
     
-    console.log(`[BOOKING INQUIRY] to: drtbsmemorialvetclinic@gmail.com`);
+    console.log(`[BOOKING INQUIRY] to: contact@senvetcare.com`);
     console.log(`From: ${firstName} ${lastName}`);
     console.log(`Email: ${email}, Phone: ${phone}`);
     console.log(`Message: ${message}`);

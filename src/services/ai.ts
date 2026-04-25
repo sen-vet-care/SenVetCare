@@ -6,9 +6,7 @@ let aiInstance: GoogleGenAI | null = null;
 const getAI = () => {
   if (aiInstance) return aiInstance;
   
-  const apiKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GEMINI_API_KEY) || 
-                 (typeof process !== 'undefined' && process.env?.GEMINI_API_KEY) || 
-                 '';
+  const apiKey = process.env.GEMINI_API_KEY || '';
                  
   aiInstance = new GoogleGenAI({ apiKey });
   return aiInstance;
@@ -25,7 +23,24 @@ You should ask one multiple-choice question at a time (up to 10 questions) until
 
 When you are ready to conclude (or reached ~10 questions max), switch status to "complete" and generate the "report" object.
 
-The clinic specifically has these diagnostic services (if tests are needed, refer to these): Digital Radiography, Urinalysis, Complete Blood Count (CBC).
+The clinic has these diagnostic services (Exclusively recommend these if tests are needed): 
+- Digital Radiography
+- Urinalysis
+- Complete Blood Count (CBC)
+- Biochemistry Panel
+- Abdominal Ultrasound (USG)
+- ECG
+- Culture & Sensitivity
+- Cytology
+- SNAP Tests (Parvo, Distemper, Heartworm, etc.)
+
+Clinic Doctors (Exclusively recommend these doctors from the clinic):
+- Dr. Halder
+- Dr. Karim
+- Dr. Shivangi
+- Dr. Bala
+- Dr. Roy
+- Dr. Shome
 
 The urgencyLevel MUST be:
 RED: Emergency — immediate action required
@@ -39,15 +54,26 @@ JSON Schema format to follow:
   "options": ["Option 1", "Option 2", "Others"], // Empty if complete
   "report": null | {
     "urgencyLevel": "RED" | "ORANGE" | "GREEN",
-    "summary": "Plain language recap of everything the owner described.",
+    "consultationId": "LILY-RPT-YYYYMMDD-XXXX",
+    "summary": "Plain language recap of everything the owner described, written warmly as if confirming understanding.",
     "differentialDiagnoses": [
-       { "condition": "Condition Name", "probability": 67, "reasoning": "Explanation based on inputs" }
+       { 
+         "condition": "Condition Name", 
+         "probability": 67, 
+         "reasoning": "Specific explanation of WHY based on inputs. Mention symptoms provided." 
+       }
     ],
-    "recommendedTests": ["Test 1", "Test 2"],
-    "generalTreatment": "General line of treatment overview",
-    "homeManagement": ["Advice 1", "Advice 2"],
+    "recommendedTests": ["Test Name 1", "Test Name 2"],
+    "clinicDiagnosticServices": [
+       { "service": "Service Name", "inHouse": true, "description": "Short benefit of this test" }
+    ],
+    "generalTreatment": "General line of treatment overview (clinical approach, not specific meds)",
+    "homeManagementAdvice": ["Advice 1", "Advice 2"],
     "warningSigns": ["Sign 1", "Sign 2"],
-    "followUpRecommendation": "Re-consult timeline"
+    "followUp": "Suggested timeline (e.g., 48 hours)",
+    "recommendedDoctors": [
+       { "name": "Dr. Name", "reason": "Why this doctor is relevant to this case" }
+    ]
   }
 }
 `;
@@ -63,7 +89,8 @@ Name: ${petData.petName}
 Species: ${petData.species}
 Breed: ${petData.breed}
 Sex: ${petData.sex}
-Age: ${petData.age}
+Age: ${petData.age} ${petData.ageUnit}
+DOB: ${petData.dob}
 Weight: ${petData.weight}
 Vaccinations: ${petData.vaccinations.join(', ') || 'Unknown'}
 Initial Issue: ${petData.problemDescription}
@@ -75,7 +102,7 @@ Initial Issue: ${petData.problemDescription}
     }));
 
     const response = await ai.models.generateContent({
-      model: 'gemini-3.1-pro-preview',
+      model: 'gemini-3-flash-preview',
       contents,
       config: {
         systemInstruction: DR_LILY_SYSTEM_PROMPT + '\n' + systemContext,

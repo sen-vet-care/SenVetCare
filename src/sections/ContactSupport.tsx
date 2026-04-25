@@ -111,7 +111,7 @@ export const ContactSupport = () => {
         >
             <div className="p-8 rounded-3xl bg-surface/60 backdrop-blur-md border border-outline-variant/30 shadow-[0_8px_30px_rgb(0,0,0,0.04)] relative overflow-hidden">
                 <h2 className="font-manrope font-bold text-[32px] text-ink-depth mb-2 relative z-10">Send a Message</h2>
-                <p className="font-inter text-[16px] text-on-surface-variant mb-8 relative z-10">Fill out the form below and our reception team will get back to you shortly to drtbsmemorialvetclinic@gmail.com.</p>
+                <p className="font-inter text-[16px] text-on-surface-variant mb-8 relative z-10">Fill out the form below and our reception team will get back to you shortly. You can also reach us directly at contact@senvetcare.com.</p>
                 
                 {status === 'success' ? (
                   <div className="bg-pharmacy-green/10 border border-pharmacy-green/30 text-pharmacy-green p-8 rounded-2xl text-center relative z-10 animate-fade-in">

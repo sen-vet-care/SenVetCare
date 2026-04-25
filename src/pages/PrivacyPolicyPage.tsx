@@ -35,7 +35,7 @@ export const PrivacyPolicyPage = () => {
 
         <h2 className="font-manrope font-bold text-2xl text-ink-depth mt-10 mb-4">Contact Us</h2>
         <p className="mb-6">
-          If you have any questions or concerns about this Privacy Policy, please contact us at drtbsmemorialvetclinic@gmail.com.
+          If you have any questions or concerns about this Privacy Policy, please contact us at contact@senvetcare.com.
         </p>
       </div>
     </main>

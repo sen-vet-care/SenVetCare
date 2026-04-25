@@ -77,7 +77,7 @@ export const OurDoctors = () => {
       shifts: [
         { shift: "Morning", time: "11:30am - 2:30pm", doctors: "Dr Das", type: "regular" },
         { shift: "Afternoon", time: "3:00pm - 5:00pm", doctors: "Dr Bala", type: "regular" },
-        { shift: "Evening", time: "6:30pm - 9:00pm", doctors: "Dr Sen + Dr Halder", type: "regular" },
+        { shift: "Evening", time: "6:30pm - 9:00pm", doctors: "Dr Halder", type: "regular" },
         { shift: "Emergency", time: "11:30pm - 6:00am", doctors: "Dr Halder", type: "emergency" },
       ]
     },
@@ -95,7 +95,7 @@ export const OurDoctors = () => {
       shifts: [
         { shift: "Morning", time: "11:30am - 2:30pm", doctors: "Dr Das", type: "regular" },
         { shift: "Afternoon", time: "3:00pm - 5:00pm", doctors: "Dr Shivangi", type: "regular" },
-        { shift: "Evening", time: "6:30pm - 9:00pm", doctors: "Dr Sen + Dr Halder", type: "regular" },
+        { shift: "Evening", time: "6:30pm - 9:00pm", doctors: "Dr Halder", type: "regular" },
         { shift: "Emergency", time: "11:30pm - 6:00am", doctors: "Dr Halder", type: "emergency" },
       ]
     },
@@ -114,7 +114,7 @@ export const OurDoctors = () => {
       shifts: [
         { shift: "Morning", time: "11:30am - 2:30pm", doctors: "Dr Pallab Mondol", type: "regular" },
         { shift: "Afternoon", time: "3:00pm - 5:00pm", doctors: "Dr Shivangi", type: "regular" },
-        { shift: "Evening", time: "6:30pm - 9:00pm", doctors: "Dr Sen + Dr Tofi Mondol", type: "regular" },
+        { shift: "Evening", time: "6:30pm - 9:00pm", doctors: "Dr Tofi Mondol", type: "regular" },
         { shift: "Emergency", time: "11:30pm - 6:00am", doctors: "Dr Halder", type: "emergency" },
       ]
     },
@@ -154,6 +154,8 @@ export const OurDoctors = () => {
         <div className="w-full bg-surface-container rounded-3xl overflow-hidden relative group shadow-2xl mb-16 flex items-center justify-center">
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10 pointer-events-none"></div>
             <img 
+                loading="lazy"
+                decoding="async"
                 src="https://ik.imagekit.io/senvetcare/Logo/Team%20SenVetCare.webp" 
                 alt="SenVetCare Team" 
                 className="w-full h-auto max-h-[600px] object-contain transition-all duration-1000 transform scale-95 group-hover:scale-100"

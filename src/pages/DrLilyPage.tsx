@@ -50,12 +50,71 @@ export const DrLilyPage = () => {
     breed: '',
     sex: '',
     age: '',
+    dob: '',
+    ageUnit: 'years' as 'years' | 'months' | 'days',
     weight: '',
     vaccinations: [] as string[],
     problemDescription: '',
     files: [] as File[],
     agreedDisclaimer: false
   });
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [step]);
+
+  const calculateAgeFromDOB = (dobString: string, unit: 'years' | 'months' | 'days') => {
+    if (!dobString) return '';
+    const birthDate = new Date(dobString);
+    const today = new Date();
+    
+    const diffTime = Math.abs(today.getTime() - birthDate.getTime());
+    
+    if (unit === 'days') {
+      return Math.floor(diffTime / (1000 * 60 * 60 * 24)).toString();
+    } else if (unit === 'months') {
+      const months = (today.getFullYear() - birthDate.getFullYear()) * 12 + (today.getMonth() - birthDate.getMonth());
+      return months.toString();
+    } else {
+      let years = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        years--;
+      }
+      return years.toString();
+    }
+  };
+
+  const calculateDOBFromAge = (ageValue: string, unit: 'years' | 'months' | 'days') => {
+    if (!ageValue) return '';
+    const age = parseInt(ageValue);
+    if (isNaN(age)) return '';
+    
+    const date = new Date();
+    if (unit === 'days') {
+      date.setDate(date.getDate() - age);
+    } else if (unit === 'months') {
+      date.setMonth(date.getMonth() - age);
+    } else {
+      date.setFullYear(date.getFullYear() - age);
+    }
+    return date.toISOString().split('T')[0];
+  };
+
+  const handleDOBChange = (dob: string) => {
+    const age = calculateAgeFromDOB(dob, formData.ageUnit);
+    setFormData(prev => ({ ...prev, dob, age }));
+  };
+
+  const handleAgeChange = (age: string) => {
+    const dob = calculateDOBFromAge(age, formData.ageUnit);
+    setFormData(prev => ({ ...prev, age, dob }));
+  };
+
+  const handleUnitChange = (unit: 'years' | 'months' | 'days') => {
+    const age = calculateAgeFromDOB(formData.dob, unit);
+    setFormData(prev => ({ ...prev, ageUnit: unit, age }));
+  };
 
   const [triageHistory, setTriageHistory] = useState<Message[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<any>(null);
@@ -66,9 +125,9 @@ export const DrLilyPage = () => {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   // Login simulation states
-  const [loginPhone, setLoginPhone] = useState('');
-  const [loginOtp, setLoginOtp] = useState('');
-  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
 
   // Mock registered pets
   const mockPets = [
@@ -78,20 +137,21 @@ export const DrLilyPage = () => {
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isOtpSent) {
-      if (loginPhone.length >= 10) {
-        setIsOtpSent(true);
-      }
-    } else {
-      if (loginOtp === '1234') {
-        const ownerName = 'John Doe';
+    setIsAuthenticating(true);
+    
+    // Simulate authentication
+    setTimeout(() => {
+      setIsAuthenticating(false);
+      // For demo, any valid email format works
+      if (loginEmail.includes('@') && loginEmail.length > 5) {
+        const ownerName = loginEmail.split('@')[0];
         updateFormData('ownerName', ownerName);
-        updateFormData('mobileNumber', loginPhone);
+        updateFormData('emailAddress', loginEmail);
         setStep('select-pet');
       } else {
-        alert('Invalid OTP. Use 1234');
+        alert('Please enter a valid clinical email address.');
       }
-    }
+    }, 1200);
   };
 
   const handleSelectMockPet = (pet: typeof mockPets[0]) => {
@@ -110,6 +170,8 @@ export const DrLilyPage = () => {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chatBottomRef = useRef<HTMLDivElement>(null);
+
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   const updateFormData = (key: string, value: any) => {
     setFormData(prev => ({ ...prev, [key]: value }));
@@ -163,9 +225,9 @@ export const DrLilyPage = () => {
          });
          setStep('result');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Error starting triage. Please check your connection.");
+      alert("Even Doctors get sick. Please inform the developer that Dr. Lily is not feeling well, taken leave and needs immediate attention. Sorry I cannot help now, you call the clinic directly at 9871155162");
       setStep('problem');
     }
   };
@@ -191,30 +253,38 @@ export const DrLilyPage = () => {
       } else if (res.status === 'complete' || res.report) {
         setReportData(res.report);
         setStep('result');
+        // Trigger automatic clinic alert simulation
+        console.log("Automatic Clinic Alert Sent for Case:", res.report?.consultationId);
       } else {
          throw new Error("Invalid response format");
       }
     } catch (err) {
       console.error(err);
-      alert("Failed to process your response. Concluding assessment.");
-      setReportData({
-         urgencyLevel: 'ORANGE',
-         summary: "Triage ended prematurely. Please review with a vet.",
-         differentialDiagnoses: [],
-         recommendedTests: ["Standard Veterinary Exam"],
-         generalTreatment: "Consult a professional for specific treatment.",
-         homeManagement: [],
-         warningSigns: [],
-         followUpRecommendation: "Visit the clinic."
-      });
+      alert("Even Doctors get sick. Please inform the developer that Dr. Lily is not feeling well, taken leave and needs immediate attention. Sorry I cannot help now, you call the clinic directly at 9871155162");
+      // Fallback
       setStep('result');
+      if (!reportData) {
+         setReportData({
+            urgencyLevel: 'ORANGE',
+            consultationId: `LILY-${Date.now()}`,
+            summary: "Error during live evaluation. Please consult a vet immediately.",
+            differentialDiagnoses: [],
+            recommendedTests: [],
+            clinicDiagnosticServices: [],
+            generalTreatment: "Emergency triage failed. Contact clinic.",
+            homeManagementAdvice: [],
+            warningSigns: [],
+            followUp: "Immediate",
+            recommendedDoctors: []
+         });
+      }
     }
     setTriageLoading(false);
   };
 
   useEffect(() => {
-     if (step === 'triage') {
-        chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+     if (step === 'triage' && chatContainerRef.current) {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
      }
   }, [triageHistory, currentQuestion, step]);
 
@@ -319,37 +389,37 @@ export const DrLilyPage = () => {
                 </div>
                 
                 <form onSubmit={handleLoginSubmit} className="space-y-6">
-                  {!isOtpSent ? (
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-widest text-[#A0A0B0] mb-3">Mobile Number</label>
-                      <input 
-                        type="tel" 
-                        required 
-                        value={loginPhone}
-                        onChange={(e) => setLoginPhone(e.target.value)}
-                        placeholder="Enter 10-digit number"
-                        className="w-full bg-[#1C1C22] border border-[#2A2A35] rounded-2xl px-5 py-4 text-white focus:border-[#6EE7B7] outline-none transition-colors"
-                      />
-                    </div>
-                  ) : (
-                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
-                      <label className="block text-xs font-bold uppercase tracking-widest text-[#A0A0B0] mb-3">Enter OTP (Use 1234)</label>
-                      <input 
-                        type="text" 
-                        required 
-                        value={loginOtp}
-                        onChange={(e) => setLoginOtp(e.target.value)}
-                        placeholder="4-digit code"
-                        className="w-full bg-[#1C1C22] border border-[#2A2A35] rounded-2xl px-5 py-4 text-white focus:border-[#6EE7B7] outline-none transition-colors tracking-[0.5em] text-center text-xl"
-                      />
-                    </motion.div>
-                  )}
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-widest text-[#A0A0B0] mb-3">Email Address</label>
+                    <input 
+                      type="email" 
+                      required 
+                      value={loginEmail}
+                      onChange={(e) => setLoginEmail(e.target.value)}
+                      placeholder="e.g., patient@email.com"
+                      className="w-full bg-[#1C1C22] border border-[#2A2A35] rounded-2xl px-5 py-4 text-white focus:border-[#6EE7B7] outline-none transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-widest text-[#A0A0B0] mb-3">Security Password</label>
+                    <input 
+                      type="password" 
+                      required 
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full bg-[#1C1C22] border border-[#2A2A35] rounded-2xl px-5 py-4 text-white focus:border-[#6EE7B7] outline-none transition-colors"
+                    />
+                  </div>
                   
                   <button 
                     type="submit"
-                    className="w-full bg-white text-black hover:bg-[#6EE7B7] transition-colors py-4 rounded-full font-bold uppercase tracking-widest text-xs mt-4"
+                    disabled={isAuthenticating}
+                    className="w-full bg-white text-black hover:bg-[#6EE7B7] transition-colors py-4 rounded-full font-bold uppercase tracking-widest text-xs mt-4 flex items-center justify-center gap-2"
                   >
-                    {isOtpSent ? 'Verify & Continue' : 'Send OTP'}
+                    {isAuthenticating ? (
+                      <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                    ) : 'Authenticate Access'}
                   </button>
                 </form>
               </motion.div>
@@ -480,10 +550,38 @@ export const DrLilyPage = () => {
                       </div>
                     )}
 
-                    <div className="grid grid-cols-2 gap-6 mb-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                       <div className="relative">
-                        <label className="text-xs text-[#A0A0B0] mb-2 block">DOB / Age Approx.</label>
-                        <input type="text" className="w-full bg-[#1C1C22] border border-[#2A2A35] rounded-xl py-3 px-4 focus:outline-none focus:border-[#6EE7B7] text-[#F2F2F4]" value={formData.age} onChange={e => updateFormData('age', e.target.value)} />
+                        <label className="text-xs text-[#A0A0B0] mb-2 block">Date of Birth</label>
+                        <input 
+                          type="date" 
+                          className="w-full bg-[#1C1C22] border border-[#2A2A35] rounded-xl py-3 px-4 focus:outline-none focus:border-[#6EE7B7] text-[#F2F2F4] [color-scheme:dark]" 
+                          value={formData.dob} 
+                          onChange={e => handleDOBChange(e.target.value)} 
+                        />
+                      </div>
+                      <div className="relative">
+                        <label className="text-xs text-[#A0A0B0] mb-2 block">Age Approx.</label>
+                        <div className="flex gap-2">
+                           <input 
+                             type="number" 
+                             className="flex-1 bg-[#1C1C22] border border-[#2A2A35] rounded-xl py-3 px-4 focus:outline-none focus:border-[#6EE7B7] text-[#F2F2F4]" 
+                             placeholder="Value"
+                             value={formData.age} 
+                             onChange={e => handleAgeChange(e.target.value)} 
+                           />
+                           <div className="flex bg-[#1C1C22] border border-[#2A2A35] rounded-xl p-1">
+                              {(['years', 'months', 'days'] as const).map(u => (
+                                <button
+                                  key={u}
+                                  onClick={() => handleUnitChange(u)}
+                                  className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${formData.ageUnit === u ? 'bg-[#6EE7B7] text-[#0D0D0F]' : 'text-[#A0A0B0] hover:text-[#F2F2F4]'}`}
+                                >
+                                  {u[0]}
+                                </button>
+                              ))}
+                           </div>
+                        </div>
                       </div>
                       <div className="relative">
                         <label className="text-xs text-[#A0A0B0] mb-2 block">Weight (kg)</label>
@@ -657,7 +755,10 @@ export const DrLilyPage = () => {
                      </div>
                   </div>
 
-                  <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                  <div 
+                    ref={chatContainerRef}
+                    className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar"
+                  >
                      {triageHistory.map((msg, i) => (
                         <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                            <div className={`max-w-[80%] p-4 rounded-2xl text-sm leading-relaxed ${msg.role === 'user' ? 'bg-[#6EE7B7]/10 border border-[#6EE7B7]/30 text-[#6EE7B7] rounded-br-none' : 'bg-[#1C1C22] border border-[#2A2A35] text-[#F2F2F4] rounded-bl-none'}`}>
@@ -713,8 +814,8 @@ export const DrLilyPage = () => {
                                  <span className="w-2 h-2 rounded-full bg-[#A0A0B0] animate-bounce"></span>
                                  <span className="w-2 h-2 rounded-full bg-[#A0A0B0] animate-bounce" style={{ animationDelay: '0.2s' }}></span>
                                  <span className="w-2 h-2 rounded-full bg-[#A0A0B0] animate-bounce" style={{ animationDelay: '0.4s' }}></span>
-                              </div>
-                           </div>
+                             </div>
+                          </div>
                         </div>
                      )}
                      <div ref={chatBottomRef}></div>
@@ -725,119 +826,315 @@ export const DrLilyPage = () => {
             {step === 'result' && reportData && (
               <motion.div 
                  key="result"
-                 initial={{ opacity: 0, y: 30 }}
-                 animate={{ opacity: 1, y: 0 }}
-                 className="w-full max-w-4xl mx-auto"
+                 initial={{ opacity: 0 }}
+                 animate={{ opacity: 1 }}
+                 className="w-full min-h-screen text-white pb-24"
               >
-                 <div className="bg-black/50 backdrop-blur-xl rounded-[2rem] border border-white/20 p-8 md:p-12 shadow-2xl relative overflow-hidden">
-                    <div className="bg-[#EF4444] text-white text-[10px] font-black uppercase text-center py-2 px-4 rounded-lg mb-8 tracking-widest inline-block w-full">
-                      ⚠️ This assessment was generated by Dr. Lily, an AI assistant trained exclusively on veterinary science. It is not a substitute for professional veterinary diagnosis or treatment.
-                    </div>
+                 {/* 1. AI Disclaimer Banner */}
+                 <div className="bg-white/10 backdrop-blur-md border-b border-white/20 py-3 px-6 sticky top-0 z-50 text-center">
+                    <p className="text-[10px] md:text-xs font-bold leading-relaxed max-w-4xl mx-auto">
+                       ⚠️ This assessment was generated by Dr. Lily, an AI assistant trained exclusively on veterinary science. It is not a substitute for professional veterinary diagnosis or treatment. Please consult a licensed veterinarian.
+                    </p>
+                 </div>
+
+                 <div id="lily-report-content" className="max-w-4xl mx-auto px-6 py-12">
+                   {/* 2. Report Header */}
+                   <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-12 pb-12 border-b border-white/20">
 
                     <div className="flex justify-between items-start mb-10 pb-8 border-b border-white/10">
                        <div>
-                         <h2 className="text-3xl font-manrope font-bold text-white mb-2">Clinical Report</h2>
-                         <p className="text-white/60 text-sm">LILY-RPT-{Math.random().toString(36).substring(2, 8).toUpperCase()}</p>
-                       </div>
-                       <div className="text-right">
-                         <p className="text-white font-bold">{formData.petName || 'Patient'}</p>
-                         <p className="text-white/60 text-sm">{formData.species} • {formData.breed}</p>
+                                <h1 className="font-manrope font-bold text-2xl tracking-tight text-white">Diagnosis & Recommendation Report</h1>
+                                <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest">Generated by Dr. Lily AI</p>
+                             </div>
+                          </div>
+                          <div className="space-y-1 text-white">
+                             <p className="text-sm font-medium">Owner: {formData.ownerName}</p>
+                             <p className="text-sm text-white/70">Contact: {formData.mobileNumber}</p>
+                             <p className="text-sm text-white/70">Report ID: <span className="font-mono">{reportData.consultationId || `LILY-RPT-${Math.random().toString(36).substring(2, 8).toUpperCase()}`}</span></p>
+                             <p className="text-sm text-white/70">Date: {new Date().toLocaleString()}</p>
+                          </div>
+                       <div className="bg-white/10 backdrop-blur-sm border border-white/20 p-6 rounded-3xl min-w-[280px]">
+                          <div className="flex items-center gap-2 mb-4">
+                             <span className="material-symbols-outlined text-[#6EE7B7]">pets</span>
+                             <span className="font-bold uppercase tracking-widest text-[10px] text-[#6EE7B7]">Patient Profile</span>
+                          </div>
+                          <h2 className="text-2xl font-manrope font-bold mb-2">{formData.petName || 'Unknown Patient'}</h2>
+                          <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-white">
+                             <div>
+                                <p className="text-[10px] uppercase font-black text-white/40">Species</p>
+                                <p className="text-sm font-medium">{formData.species}</p>
+                             </div>
+                             <div>
+                                <p className="text-[10px] uppercase font-black text-white/40">Breed</p>
+                                <p className="text-sm font-medium">{formData.breed}</p>
+                             </div>
+                             <div>
+                                <p className="text-[10px] uppercase font-black text-white/40">Age / Sex</p>
+                                <p className="text-sm font-medium">{formData.age} {formData.ageUnit} • {formData.sex}</p>
+                             </div>
+                             <div>
+                                <p className="text-[10px] uppercase font-black text-white/40">Weight</p>
+                                <p className="text-sm font-medium">{formData.weight} kg</p>
+                             </div>
+                          </div>
                        </div>
                     </div>
 
-                    <div className="mb-10 p-6 bg-white/10 rounded-2xl border border-white/10">
-                       <h3 className="text-[11px] uppercase font-black text-white/50 tracking-widest mb-3">Assessment Summary</h3>
-                       <p className="text-white text-sm leading-relaxed">{reportData.summary}</p>
+                    {/* 3. Priority Actions */}
+                    <div className="mb-16">
+                       <h3 className="text-[11px] uppercase font-black text-white/50 tracking-widest mb-6 border-b border-white/10 pb-2">Immediate Recommended Actions</h3>
+                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          {reportData.urgencyLevel === 'RED' ? (
+                             <>
+                                <div className="p-6 rounded-3xl bg-white text-black flex flex-col items-center text-center shadow-xl">
+                                   <span className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-black text-xs mb-4">1</span>
+                                   <span className="material-symbols-outlined text-4xl mb-2 text-[#EF4444]">emergency</span>
+                                   <p className="font-bold leading-tight">Visit the clinic immediately</p>
+                                   <p className="text-[10px] mt-2 opacity-60">Emergency hours active</p>
+                                </div>
+                                <div className="p-6 rounded-3xl bg-white/10 border border-white/20 flex flex-col items-center text-center">
+                                   <span className="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center font-black text-xs mb-4">2</span>
+                                   <span className="material-symbols-outlined text-4xl mb-2 text-white">home_health</span>
+                                   <p className="font-bold leading-tight text-white">Call on-call vet to home</p>
+                                </div>
+                                <div className="p-6 rounded-3xl bg-white/10 border border-white/20 flex flex-col items-center text-center">
+                                   <span className="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center font-black text-xs mb-4">3</span>
+                                   <span className="material-symbols-outlined text-4xl mb-2 text-white">videocam</span>
+                                   <p className="font-bold leading-tight text-white">Teleconsultation</p>
+                                </div>
+                             </>
+                          ) : reportData.urgencyLevel === 'ORANGE' ? (
+                             <>
+                                <div className="p-6 rounded-3xl bg-white text-black flex flex-col items-center text-center shadow-xl">
+                                   <span className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-black text-xs mb-4">1</span>
+                                   <span className="material-symbols-outlined text-4xl mb-2 text-[#F97316]">home_health</span>
+                                   <p className="font-bold leading-tight">Call clinic vet to home</p>
+                                   <p className="text-[10px] mt-2 opacity-60">Recommended for moderate urgency</p>
+                                </div>
+                                <div className="p-6 rounded-3xl bg-white/10 border border-white/20 flex flex-col items-center text-center text-white">
+                                   <span className="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center font-black text-xs mb-4">2</span>
+                                   <span className="material-symbols-outlined text-4xl mb-2">local_hospital</span>
+                                   <p className="font-bold leading-tight">Visit the clinic</p>
+                                </div>
+                                <div className="p-6 rounded-3xl bg-white/10 border border-white/20 flex flex-col items-center text-center text-white">
+                                   <span className="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center font-black text-xs mb-4">3</span>
+                                   <span className="material-symbols-outlined text-4xl mb-2">videocam</span>
+                                   <p className="font-bold leading-tight">Teleconsultation</p>
+                                </div>
+                             </>
+                          ) : (
+                             <>
+                                <div className="p-6 rounded-3xl bg-white text-black flex flex-col items-center text-center shadow-xl">
+                                   <span className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-black text-xs mb-4">1</span>
+                                   <span className="material-symbols-outlined text-4xl mb-2 text-[#22C55E]">videocam</span>
+                                   <p className="font-bold leading-tight">Teleconsultation</p>
+                                   <p className="text-[10px] mt-2 opacity-60">First priority for non-urgent</p>
+                                </div>
+                                <div className="p-6 rounded-3xl bg-white/10 border border-white/20 flex flex-col items-center text-center text-white">
+                                   <span className="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center font-black text-xs mb-4">2</span>
+                                   <span className="material-symbols-outlined text-4xl mb-2">home_health</span>
+                                   <p className="font-bold leading-tight">Call vet to home</p>
+                                </div>
+                                <div className="p-6 rounded-3xl bg-white/10 border border-white/20 flex flex-col items-center text-center text-white">
+                                   <span className="w-8 h-8 rounded-full bg-white/20 text-white flex items-center justify-center font-black text-xs mb-4">3</span>
+                                   <span className="material-symbols-outlined text-4xl mb-2">event_available</span>
+                                   <p className="font-bold leading-tight">Book in-clinic appointment</p>
+                                </div>
+                             </>
+                          )}
+                       </div>
+                    </div>
+
+                    <div className="mb-16 p-8 bg-white/10 rounded-[2rem] border border-white/20 backdrop-blur-md">
+                       <h3 className="text-[11px] uppercase font-black text-white/50 tracking-widest mb-4">Lily's Summary of Symptoms</h3>
+                       <p className="text-lg font-medium leading-relaxed italic text-white">"{reportData.summary}"</p>
                     </div>
 
                     {reportData.differentialDiagnoses?.length > 0 && (
                       <div className="mb-12">
-                         <h3 className="text-[11px] uppercase font-black text-white/50 tracking-widest mb-4">Differential Diagnoses</h3>
+                         <h3 className="text-[11px] uppercase font-black text-white/50 tracking-widest mb-6">Differential Diagnoses</h3>
                          <div className="space-y-4">
                             {reportData.differentialDiagnoses.map((d: any, i: number) => (
-                               <div key={i} className="bg-white/5 border border-white/10 p-5 rounded-2xl">
-                                  <div className="flex justify-between items-center mb-2">
-                                     <p className="font-bold text-white">{d.condition}</p>
-                                     <p className="text-white font-manrope">{typeof d.probability === 'number' ? d.probability + '%' : d.probability}</p>
-                                  </div>
-                                  <div className="w-full bg-black/50 h-2 rounded-full overflow-hidden mb-3">
-                                     <div className="bg-white h-full" style={{ width: `${typeof d.probability === 'number' ? d.probability : parseInt(d.probability) || 50}%` }}></div>
-                                  </div>
-                                  <p className="text-white/60 text-xs leading-relaxed">{d.reasoning}</p>
-                               </div>
+                                <div key={i} className="bg-white/5 border border-white/10 p-8 rounded-[2rem]">
+                                   <div className="flex justify-between items-end mb-4 text-white">
+                                      <div>
+                                         <p className="text-[10px] uppercase font-black text-white/40 mb-1">Suspected Condition</p>
+                                         <h4 className="text-xl font-bold">{d.condition}</h4>
+                                      </div>
+                                      <div className="text-right">
+                                         <p className="text-2xl font-black font-manrope">{typeof d.probability === 'number' ? d.probability + '%' : d.probability}</p>
+                                      </div>
+                                   </div>
+                                   <div className="w-full bg-black/30 h-3 rounded-full overflow-hidden mb-6">
+                                      <motion.div 
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${typeof d.probability === 'number' ? d.probability : parseInt(d.probability) || 50}%` }}
+                                        transition={{ delay: 0.5, duration: 1.5 }}
+                                        className="bg-white h-full"
+                                      ></motion.div>
+                                   </div>
+                                   <div className="text-white">
+                                      <p className="text-[10px] uppercase font-black text-white/40 mb-2">Clinical Reasoning</p>
+                                      <p className="text-sm text-white/80 leading-relaxed">{d.reasoning}</p>
+                                   </div>
+                                </div>
                             ))}
                          </div>
                       </div>
                     )}
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 border-t border-white/10 pt-10">
-                       <div>
-                         <h3 className="text-[11px] uppercase font-black text-white/50 tracking-widest mb-4">Recommended Tests</h3>
-                         <ul className="space-y-2">
-                            {reportData.recommendedTests?.map((t: string, i: number) => (
-                               <li key={i} className="flex gap-2 items-start text-sm text-white"><span className="text-white/50">•</span> {t}</li>
-                            ))}
-                         </ul>
-                         <div className="mt-6 p-5 border border-white/20 bg-white/5 rounded-xl text-center">
-                            <p className="text-xs text-white/70 mb-3">Book tests seamlessly at the clinic.</p>
-                            <Link to={reportData.urgencyLevel === 'RED' ? '/book?emergency=true' : '/book'} className="inline-block text-xs font-bold uppercase tracking-widest text-[#0D0D0F] bg-white py-2 px-6 rounded-full hover:bg-white/80 transition-colors">
-                              Book At Clinic
-                            </Link>
-                         </div>
+                    {/* 6. Diagnostic Section */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16 text-white">
+                       <div className="bg-white/5 border border-white/10 p-8 rounded-[2rem]">
+                          <h3 className="text-[11px] uppercase font-black text-white/50 tracking-widest mb-6">Recommended Tests</h3>
+                          <ul className="space-y-3">
+                             {reportData.recommendedTests?.map((t: string, i: number) => (
+                                <li key={i} className="flex gap-3 items-start text-sm">
+                                   <span className="material-symbols-outlined text-sm mt-0.5">check_circle</span>
+                                   <span>{t}</span>
+                                </li>
+                             ))}
+                          </ul>
                        </div>
                        
-                       <div>
-                         <h3 className="text-[11px] uppercase font-black text-white/50 tracking-widest mb-4">Home Management</h3>
-                         <ul className="space-y-2 mb-6">
-                            {reportData.homeManagement?.map((t: string, i: number) => (
-                               <li key={i} className="flex gap-2 items-start text-sm text-white"><span className="text-white/50">•</span> {t}</li>
-                            ))}
-                         </ul>
-                         
-                         <h3 className="text-[11px] uppercase font-black text-white/50 tracking-widest mb-4 text-[#EF4444]">Escalate Immediately If</h3>
-                         <ul className="space-y-2">
-                            {reportData.warningSigns?.map((t: string, i: number) => (
-                               <li key={i} className="flex gap-2 items-start text-sm text-white"><span className="text-[#EF4444]">•</span> {t}</li>
-                            ))}
-                         </ul>
+                       <div className="bg-white text-black p-8 rounded-[2rem] shadow-xl">
+                          <h3 className="text-[11px] uppercase font-black text-black/40 tracking-widest mb-6 border-b border-black/10 pb-2">In-Clinic Diagnostics</h3>
+                          <div className="space-y-4 mb-8">
+                             {reportData.clinicDiagnosticServices?.map((s: any, i: number) => (
+                                <div key={i} className="flex justify-between items-center border-b border-black/10 pb-3">
+                                   <div className="flex-1">
+                                      <p className="font-bold text-sm">{s.service}</p>
+                                      <p className="text-[10px] opacity-60">{s.description}</p>
+                                   </div>
+                                   {s.inHouse && <span className="text-[9px] font-black uppercase bg-black text-white px-2 py-0.5 rounded ml-2">In-House</span>}
+                                </div>
+                             ))}
+                          </div>
+                          <button className="w-full bg-black text-white py-4 rounded-full font-bold uppercase tracking-widest text-[10px] hover:scale-[1.02] transition-transform flex items-center justify-center gap-2 shadow-lg">
+                             Book Test at Clinic <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                          </button>
                        </div>
                     </div>
 
-                    <div className="mb-12">
-                       <h3 className="text-[11px] uppercase font-black text-white/50 tracking-widest mb-3">General Line of Treatment</h3>
-                       <p className="text-white text-sm leading-relaxed">{reportData.generalTreatment}</p>
+                    {/* 7. Treatment & Management */}
+                    <div className="space-y-8 mb-16 text-white">
+                       <div className="bg-white/5 border border-white/10 p-8 rounded-[2rem]">
+                          <h3 className="text-[11px] uppercase font-black text-white/50 tracking-widest mb-4">General Line of Treatment</h3>
+                          <p className="text-sm leading-relaxed text-white/80">{reportData.generalTreatment}</p>
+                       </div>
+
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          <div className="bg-white/5 border border-white/10 p-8 rounded-[2rem]">
+                             <h3 className="text-[11px] uppercase font-black text-white/50 tracking-widest mb-6">Home Management Advice</h3>
+                             <ul className="space-y-3">
+                                {(reportData.homeManagementAdvice || reportData.homeManagement)?.map((t: string, i: number) => (
+                                   <li key={i} className="flex gap-3 items-start text-sm">
+                                      <span className="material-symbols-outlined text-sm mt-0.5 text-[#6EE7B7]">house</span>
+                                      <span>{t}</span>
+                                   </li>
+                                ))}
+                             </ul>
+                          </div>
+
+                          <div className="bg-white/5 border border-white/20 p-8 rounded-[2rem]">
+                             <h3 className="text-[11px] uppercase font-black text-white/50 tracking-widest mb-6 text-[#EF4444]">Escalate Immediately If</h3>
+                             <ul className="space-y-3">
+                                {reportData.warningSigns?.map((t: string, i: number) => (
+                                   <li key={i} className="flex gap-3 items-start text-sm text-white">
+                                      <span className="material-symbols-outlined text-sm mt-0.5 text-[#EF4444]">warning</span>
+                                      <span>{t}</span>
+                                   </li>
+                                ))}
+                             </ul>
+                          </div>
+                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-white/10 pt-10">
-                        {/* Primary actions pointing back to clinic */}
-                        <a href="tel:9871155162" className={`flex flex-col items-center p-6 rounded-2xl border transition-colors ${reportData.urgencyLevel === 'RED' ? 'bg-white text-black border-white' : 'bg-black/30 border-white/20 text-white hover:bg-white/10'}`}>
-                           <span className="material-symbols-outlined mb-2 text-3xl">emergency</span>
-                           <span className="font-bold mb-1">Call Emergency</span>
-                           <span className="text-[10px] uppercase font-black opacity-60">24/7 Response</span>
-                        </a>
-                        
-                        <a href="https://wa.me/message/EOOITVOJLIHNO1" className={`flex flex-col items-center p-6 rounded-2xl border transition-colors ${reportData.urgencyLevel === 'GREEN' ? 'bg-white text-black border-white' : 'bg-black/30 border-white/20 text-white hover:bg-white/10'}`}>
-                           <span className="material-symbols-outlined mb-2 text-3xl">video_camera_front</span>
-                           <span className="font-bold mb-1">Tele-Consult</span>
-                           <span className="text-[10px] uppercase font-black opacity-60">Clinic Doctor</span>
-                        </a>
-
-                        <Link to={reportData.urgencyLevel === 'RED' ? '/book?emergency=true' : '/book'} className={`flex flex-col items-center p-6 rounded-2xl border transition-colors ${reportData.urgencyLevel === 'ORANGE' ? 'bg-white text-black border-white' : 'bg-black/30 border-white/20 text-white hover:bg-white/10'}`}>
-                           <span className="material-symbols-outlined mb-2 text-3xl">home_health</span>
-                           <span className="font-bold mb-1">Clinic Visit</span>
-                           <span className="text-[10px] uppercase font-black opacity-60">Book Appointment</span>
-                        </Link>
+                    {/* 8. Doctors Recommendation */}
+                    <div className="mb-16">
+                       <h3 className="text-[11px] uppercase font-black text-white/50 tracking-widest mb-6 text-center">Recommended Doctors for this Case</h3>
+                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {reportData.recommendedDoctors?.map((doc: any, i: number) => (
+                             <div key={i} className="bg-white/10 backdrop-blur-md border border-white/20 rounded-[2rem] p-6 flex flex-col text-white">
+                                <div className="flex items-center gap-3 mb-4">
+                                   <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                                      <span className="material-symbols-outlined">person</span>
+                                   </div>
+                                   <div>
+                                      <h4 className="font-bold text-sm">{doc.name}</h4>
+                                      {doc.specialty && <p className="text-[10px] uppercase font-black text-white/40">{doc.specialty}</p>}
+                                   </div>
+                                </div>
+                                <p className="text-[11px] text-white/70 italic mb-6 leading-relaxed">"{doc.reason}"</p>
+                                <div className="mt-auto space-y-2">
+                                   <button className="w-full bg-white text-black py-2.5 rounded-full font-bold uppercase tracking-widest text-[9px] hover:bg-white/80 transition-colors">Book Appt</button>
+                                   <button className="w-full border border-white/30 text-white py-2.5 rounded-full font-bold uppercase tracking-widest text-[9px] hover:bg-white/10 transition-colors">Teleconsult</button>
+                                </div>
+                             </div>
+                          ))}
+                       </div>
                     </div>
 
-                 </div>
+                    {/* 9. Follow Up & Contact */}
+                    <div className="flex flex-col md:flex-row gap-6 mb-16">
+                       <div className="flex-1 bg-white text-black p-8 rounded-[2rem] text-center shadow-xl">
+                          <h3 className="text-[11px] uppercase font-black text-black/40 tracking-widest mb-2">Automated Follow-up</h3>
+                          <p className="text-xl font-bold mb-1">Re-consult Dr. Lily in {reportData.followUp || '48 hours'}</p>
+                          <p className="text-[10px] opacity-60">A reminder will be sent to your email</p>
+                       </div>
+                       
+                       {(reportData.urgencyLevel === 'RED' || reportData.urgencyLevel === 'ORANGE') && (
+                          <div className={`flex-1 p-8 rounded-[2rem] flex flex-col items-center justify-center text-center border-4 border-white inline-block text-white ${reportData.urgencyLevel === 'RED' ? 'bg-[#EF4444]' : 'bg-[#F97316]'}`}>
+                             <h3 className="text-[11px] uppercase font-black text-white/50 tracking-widest mb-3">Clinic Emergency Line</h3>
+                             <p className="text-2xl font-black mb-4">98711-55162</p>
+                             <a href="tel:9871155162" className="bg-white text-black px-8 py-3 rounded-full font-bold uppercase tracking-widest text-[10px] shadow-2xl">Tap to Call Now</a>
+                          </div>
+                       )}
+                    </div>
 
-                 <div className="mt-8 text-center pb-20">
-                    <button onClick={() => window.location.reload()} className="text-white/50 hover:text-white text-xs uppercase font-bold tracking-widest transition-colors mb-4 block mx-auto">
-                       Close & Return
-                    </button>
-                    <p className="text-white/40 text-[10px] max-w-sm mx-auto leading-relaxed">
-                       🌿 Be part of the ecosystem. Let's grow together with our pets. Dr. Lily is free for every pet parent.
-                    </p>
+                    {/* 10. Sharing & CTAs */}
+                    <div className="flex justify-center mb-20">
+                       <button 
+                         onClick={() => {
+                           const element = document.getElementById('lily-report-content');
+                           if (!element) return;
+                           
+                           // Dynamically import as it's a large library
+                           import('html2pdf.js').then((html2pdf) => {
+                             const opt = {
+                               margin: [10, 10, 10, 10],
+                               filename: `DrLily-Report-${formData.petName}-${new Date().getTime()}.pdf`,
+                               image: { type: 'jpeg', quality: 0.98 },
+                               html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0D0D0F' },
+                               jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                             };
+                             
+                             html2pdf.default().from(element).set(opt).save();
+                           }).catch(err => {
+                             console.error("PDF generation error:", err);
+                             alert("Error generating PDF. Please try again.");
+                           });
+                         }}
+                         className="p-8 bg-[#6EE7B7] text-[#0D0D0F] rounded-2xl flex flex-col items-center gap-4 hover:bg-[#4ADBA0] transition-all transform hover:scale-105 shadow-xl min-w-[240px]"
+                       >
+                          <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center">
+                            <span className="material-symbols-outlined text-3xl">picture_as_pdf</span>
+                          </div>
+                          <div className="text-center">
+                            <span className="text-xs uppercase font-black tracking-widest block mb-1">Download PDF</span>
+                            <span className="text-[10px] opacity-60 font-medium">Full Diagnosis & Recommendation</span>
+                          </div>
+                       </button>
+                    </div>
+
+                    <div className="text-center text-white">
+                       <p className="text-sm font-medium mb-2">🌿 Be part of the ecosystem. Let's grow together with our pets.</p>
+                       <p className="text-xs text-white/50 max-w-2xl mx-auto leading-relaxed mb-8">
+                          Dr. Lily is free for every pet parent. Join thousands of pet owners, vets, clinics, and care providers building the future of pet healthcare — together.
+                       </p>
+                       <a href="https://senvetcare.com" className="inline-block text-[10px] font-black uppercase tracking-[0.3em] bg-white text-black px-10 py-4 rounded-full">Explore Ecosystem</a>
+                       <button onClick={() => window.location.reload()} className="mt-12 text-white/30 hover:text-white text-[10px] uppercase font-bold tracking-[0.2em] block mx-auto transition-colors">Close & Return</button>
+                    </div>
                  </div>
               </motion.div>
             )}

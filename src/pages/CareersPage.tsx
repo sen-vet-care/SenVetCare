@@ -38,7 +38,7 @@ export const CareersPage = () => {
              </div>
            </div>
 
-           <a href="mailto:drtbsmemorialvetclinic@gmail.com?subject=Specialist Application" className="bg-ink-depth text-white text-center py-4 rounded-full font-inter font-bold text-[10px] tracking-[0.2em] uppercase hover:bg-primary transition-all duration-300">
+           <a href="mailto:contact@senvetcare.com?subject=Specialist Application" className="bg-ink-depth text-white text-center py-4 rounded-full font-inter font-bold text-[10px] tracking-[0.2em] uppercase hover:bg-primary transition-all duration-300">
                Apply via Resume
            </a>
         </div>
@@ -68,7 +68,7 @@ export const CareersPage = () => {
              </div>
            </div>
 
-           <a href="mailto:drtbsmemorialvetclinic@gmail.com?subject=Technician Application" className="bg-ink-depth text-white text-center py-4 rounded-full font-inter font-bold text-[10px] tracking-[0.2em] uppercase hover:bg-secondary transition-all duration-300">
+           <a href="mailto:contact@senvetcare.com?subject=Technician Application" className="bg-ink-depth text-white text-center py-4 rounded-full font-inter font-bold text-[10px] tracking-[0.2em] uppercase hover:bg-secondary transition-all duration-300">
                Apply via Resume
            </a>
         </div>
@@ -98,7 +98,7 @@ export const CareersPage = () => {
              </div>
            </div>
 
-           <a href="mailto:drtbsmemorialvetclinic@gmail.com?subject=Client Experience Application" className="bg-ink-depth text-white text-center py-4 rounded-full font-inter font-bold text-[10px] tracking-[0.2em] uppercase hover:bg-waiting-gold transition-all duration-300">
+           <a href="mailto:contact@senvetcare.com?subject=Client Experience Application" className="bg-ink-depth text-white text-center py-4 rounded-full font-inter font-bold text-[10px] tracking-[0.2em] uppercase hover:bg-waiting-gold transition-all duration-300">
                Apply via Resume
            </a>
         </div>
@@ -109,7 +109,7 @@ export const CareersPage = () => {
           <p className="font-inter text-lg text-on-surface-variant mb-8 max-w-2xl mx-auto">
               We are constantly expanding. Send your resume and a cover letter detailing how you can contribute to Dr. Sen's legacy.
           </p>
-          <a href="mailto:drtbsmemorialvetclinic@gmail.com" className="inline-flex items-center gap-2 bg-white text-black px-8 py-4 rounded-full font-inter font-bold text-sm tracking-widest uppercase hover:bg-waiting-gold transition-colors shadow-sm">
+          <a href="mailto:contact@senvetcare.com" className="inline-flex items-center gap-2 bg-white text-black px-8 py-4 rounded-full font-inter font-bold text-sm tracking-widest uppercase hover:bg-waiting-gold transition-colors shadow-sm">
              Email resume <span className="material-symbols-outlined text-[18px]">mail</span>
           </a>
       </div>

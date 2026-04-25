@@ -1,11 +1,10 @@
 import { Suspense, lazy, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { HeroReception } from '../sections/HeroReception';
-import { OurDoctors } from '../sections/OurDoctors';
-import { Services } from '../sections/Services';
-import { AboutLegacy } from '../sections/AboutLegacy';
-import { EmergencyBooking } from '../sections/Emergency';
-import { Testimonials } from '../sections/Testimonials';
+const OurDoctors = lazy(() => import('../sections/OurDoctors').then(module => ({ default: module.OurDoctors })));
+const Services = lazy(() => import('../sections/Services').then(module => ({ default: module.Services })));
+const AboutLegacy = lazy(() => import('../sections/AboutLegacy').then(module => ({ default: module.AboutLegacy })));
+const Testimonials = lazy(() => import('../sections/Testimonials').then(module => ({ default: module.Testimonials })));
 import { Link } from 'react-router-dom';
 
 const SectionLoader = () => (
@@ -24,11 +23,11 @@ export const HomePage = () => {
       {/* Dynamic Parallax Background Elements */}
       <motion.div 
         style={{ y: bgY }}
-        className="absolute top-0 left-0 w-full h-[200%] pointer-events-none -z-20 opacity-30"
+        className="absolute top-0 left-0 w-full h-[200%] pointer-events-none -z-20 opacity-20"
       >
-        <div className="absolute top-[10%] left-[5%] w-[40vw] h-[40vw] bg-primary/10 blur-[150px] rounded-full"></div>
-        <div className="absolute top-[40%] right-[5%] w-[35vw] h-[35vw] bg-waiting-gold/10 blur-[150px] rounded-full"></div>
-        <div className="absolute top-[70%] left-[15%] w-[45vw] h-[45vw] bg-secondary/10 blur-[150px] rounded-full"></div>
+        <div className="absolute top-[10%] left-[5%] w-[40vw] h-[40vw] bg-primary/10 blur-[100px] rounded-full"></div>
+        <div className="absolute top-[40%] right-[5%] w-[35vw] h-[35vw] bg-waiting-gold/10 blur-[100px] rounded-full"></div>
+        <div className="absolute top-[70%] left-[15%] w-[45vw] h-[45vw] bg-secondary/10 blur-[100px] rounded-full"></div>
       </motion.div>
 
       <HeroReception />
@@ -38,7 +37,6 @@ export const HomePage = () => {
         <Services />
         <OurDoctors />
         <Testimonials />
-        <EmergencyBooking />
         
         {/* Stories Teaser */}
         <section className="py-20 max-w-[1280px] mx-auto px-6 text-center">

@@ -53,13 +53,6 @@ export const Footer = () => {
             <p className="text-zinc-400 text-[15px] leading-relaxed max-w-sm mb-10 font-inter">
               An institution dedicated to the legacy of Prof. Dr. Tamal Baran Sen. We bridge empirical wisdom with modern veterinary science to deliver uncompromising care.
             </p>
-            <div className="flex gap-8">
-              {['Facebook', 'Instagram', 'LinkedIn'].map((platform) => (
-                <a key={platform} href="#" className="text-[10px] uppercase tracking-[0.3em] font-bold text-zinc-600 hover:text-primary transition-colors duration-500">
-                  {platform}
-                </a>
-              ))}
-            </div>
           </div>
 
           {/* Contact Integration - Premium Sleek Form */}
@@ -83,6 +76,10 @@ export const Footer = () => {
                         Message Dispatch
                         <span className="material-symbols-outlined text-sm">north_east</span>
                       </a>
+                    </div>
+                    <div className="group cursor-default">
+                      <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-2 group-hover:text-zinc-300 transition-colors">Clinical Liaison</p>
+                      <a href="mailto:contact@senvetcare.com" className="text-white text-sm font-medium hover:text-primary transition-colors">contact@senvetcare.com</a>
                     </div>
                   </div>
                 </div>
