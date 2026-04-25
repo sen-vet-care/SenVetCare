@@ -46,12 +46,12 @@ export const Footer = () => {
           
           {/* Identity & Mission */}
           <div className="lg:col-span-4 flex flex-col items-center lg:items-start text-center lg:text-left">
-            <Link to="/" className="w-16 h-16 mb-10 block grayscale brightness-200 contrast-200">
+            <Link to="/" className="w-24 h-24 mb-8 block drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
               <img src="https://ik.imagekit.io/senvetcare/Logo/Logo%20Trans.webp" alt="SenVetCare Logo" className="w-full h-full object-contain" />
             </Link>
-            <h3 className="font-manrope font-bold text-3xl text-white mb-6 tracking-tighter">SenVetCare</h3>
-            <p className="text-zinc-500 text-sm leading-[1.8] max-w-sm mb-12">
-              An institution dedicated to the legacy of Prof. Dr. Tamal Baran Sen. We bridge empirical wisdom with modern veterinary science.
+            <h3 className="font-manrope font-extrabold text-4xl text-white mb-6 tracking-tighter">SenVetCare</h3>
+            <p className="text-zinc-400 text-[15px] leading-relaxed max-w-sm mb-10 font-inter">
+              An institution dedicated to the legacy of Prof. Dr. Tamal Baran Sen. We bridge empirical wisdom with modern veterinary science to deliver uncompromising care.
             </p>
             <div className="flex gap-8">
               {['Facebook', 'Instagram', 'LinkedIn'].map((platform) => (
@@ -90,11 +90,14 @@ export const Footer = () => {
                 <div>
                   <h4 className="text-[10px] font-black tracking-[0.25em] text-zinc-600 uppercase mb-8">Navigation</h4>
                   <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-                    {['Services', 'Pharmacy', 'Diagnostics', 'Stories', 'Privacy', 'Safety'].map((item) => (
-                      <Link key={item} to={item === 'Services' ? '/#services' : item === 'Privacy' ? '/privacy-policy' : item === 'Safety' ? '/pet-safety-guide' : `/${item.toLowerCase()}`} className="text-zinc-500 text-xs hover:text-white transition-colors">
-                        {item}
-                      </Link>
-                    ))}
+                    <Link to="/treatments" className="text-zinc-500 text-xs hover:text-white transition-colors">Treatments</Link>
+                    <Link to="/preventions" className="text-zinc-500 text-xs hover:text-white transition-colors">Preventions</Link>
+                    <Link to="/diagnostics" className="text-zinc-500 text-xs hover:text-white transition-colors">Diagnostics</Link>
+                    <Link to="/pharmacy" className="text-zinc-500 text-xs hover:text-white transition-colors">Pharmacy</Link>
+                    <Link to="/stories" className="text-zinc-500 text-xs hover:text-white transition-colors">Stories</Link>
+                    <Link to="/dr-lily" className="text-zinc-500 text-xs hover:text-white transition-colors">Instant Consultation</Link>
+                    <Link to="/privacy-policy" className="text-zinc-500 text-xs hover:text-white transition-colors">Privacy Policy</Link>
+                    <Link to="/pet-safety-guide" className="text-zinc-500 text-xs hover:text-white transition-colors">Pet Safety Guide</Link>
                   </div>
                 </div>
               </div>

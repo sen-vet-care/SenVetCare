@@ -11,7 +11,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script>
       // Polyfill for process.env to prevent crashes in some libraries
-      window.process = window.process || { env: { NODE_ENV: 'production' } };
+      window.process = window.process || { 
+        env: { NODE_ENV: 'production' },
+        versions: { node: '18.0.0' },
+        cwd: function() { return '/' }
+      };
     </script>
   </head>
   <body>

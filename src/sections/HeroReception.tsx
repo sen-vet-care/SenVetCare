@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
+import { Link } from 'react-router-dom';
 
 const CAROUSEL_PHOTOS = [
   "https://ik.imagekit.io/senvetcare/2025-12-14%20(1).webp?updatedAt=1776251360784",
@@ -64,9 +65,14 @@ export const HeroReception = () => {
         style={{ y: textY }}
         className="w-full lg:w-1/2 flex flex-col items-start pt-10 lg:pt-0"
       >
-        <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full sanctuary-card mb-8 border border-waiting-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.1)]">
-          <span className="w-2.5 h-2.5 rounded-full bg-waiting-gold animate-pulse"></span>
-          <span className="font-inter font-bold text-[11px] tracking-[0.25em] text-waiting-gold uppercase">A Sanctuary of Healing</span>
+        <div className="flex flex-col items-start gap-4 px-6 py-4 rounded-[2rem] sanctuary-card mb-8 border border-white/10 shadow-[0_0_30px_rgba(255,255,255,0.05)] bg-black/40 backdrop-blur-md">
+          <h2 className="font-manrope font-extrabold text-3xl md:text-4xl text-white tracking-tight drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+            SenVetCare
+          </h2>
+          <div className="flex flex-col gap-1">
+             <span className="font-inter font-bold text-xs tracking-[0.3em] text-waiting-gold uppercase drop-shadow-[0_0_8px_rgba(212,175,55,0.4)]">Legacy</span>
+             <span className="font-inter font-bold text-xs tracking-[0.2em] text-emerald-400 uppercase drop-shadow-[0_0_8px_rgba(52,211,153,0.4)]">Dr. T. B. Sen Memorial Veterinary Clinic</span>
+          </div>
         </div>
         
         <h1 className="font-manrope font-light text-[56px] lg:text-[80px] text-white leading-[1.05] tracking-tight mb-8">
@@ -79,10 +85,10 @@ export const HeroReception = () => {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">
-          <a href="/#contact" className="w-full sm:w-auto px-8 py-4 bg-white text-black rounded-full font-inter font-bold text-sm tracking-widest uppercase hover:bg-waiting-gold hover:text-black transition-all duration-500 shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_40px_rgba(212,175,55,0.3)] hover:scale-105 flex items-center justify-center gap-3">
-            Book a Journey
+          <Link to="/dr-lily" className="w-full sm:w-auto px-8 py-4 bg-white text-black rounded-full font-inter font-bold text-sm tracking-widest uppercase hover:bg-waiting-gold hover:text-black transition-all duration-500 shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_40px_rgba(212,175,55,0.3)] hover:scale-105 flex items-center justify-center gap-3">
+            Book Clinic Appointment
             <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-          </a>
+          </Link>
           
           <div className="flex items-center gap-4 text-on-surface-variant justify-center sm:justify-start">
             <div className="flex -space-x-4">

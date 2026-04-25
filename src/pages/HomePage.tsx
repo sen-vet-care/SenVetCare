@@ -6,7 +6,6 @@ import { Services } from '../sections/Services';
 import { AboutLegacy } from '../sections/AboutLegacy';
 import { EmergencyBooking } from '../sections/Emergency';
 import { Testimonials } from '../sections/Testimonials';
-import { ContactSupport } from '../sections/ContactSupport';
 import { Link } from 'react-router-dom';
 
 const SectionLoader = () => (
@@ -21,7 +20,7 @@ export const HomePage = () => {
   const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
 
   return (
-    <main className="flex-grow relative">
+    <main className="flex-grow relative overflow-hidden">
       {/* Dynamic Parallax Background Elements */}
       <motion.div 
         style={{ y: bgY }}
@@ -52,8 +51,6 @@ export const HomePage = () => {
                 <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </Link>
         </section>
-        
-        <ContactSupport />
       </Suspense>
     </main>
   );

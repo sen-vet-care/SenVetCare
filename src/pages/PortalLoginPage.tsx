@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 export const PortalLoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [userType, setUserType] = useState('pet-owner');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -14,7 +15,7 @@ export const PortalLoginPage = () => {
     // Simulate login for now as we don't have a backend auth yet
     setTimeout(() => {
       setIsLoading(false);
-      alert('Clinical Portal access is currently restricted to authorized personnel only. Please contact the administrator.');
+      alert(`Access restricted for ${userType.replace('-', ' ')} type accounts at this moment.`);
     }, 1500);
   };
 
@@ -34,37 +35,60 @@ export const PortalLoginPage = () => {
       >
         <div className="text-center mb-10">
           <div className="w-24 h-24 mx-auto mb-6">
-            <img src="https://ik.imagekit.io/senvetcare/Logo/Logo%20Trans.webp" alt="SenVetCare" className="w-full h-full object-contain brightness-200 contrast-125" />
+            <img src="https://ik.imagekit.io/senvetcare/Logo/Logo%20Trans.webp" alt="SenVetCare" className="w-full h-full object-contain filter invert opacity-90" />
           </div>
-          <h1 className="font-manrope font-bold text-3xl text-white mb-2 tracking-tight">Clinical Portal</h1>
-          <p className="font-inter text-zinc-600 text-[10px] uppercase font-bold tracking-[0.2em]">Secure Authentication Required</p>
+          <h1 className="font-manrope font-bold text-3xl text-white mb-2 tracking-tight uppercase">Clinical Portal</h1>
+          <p className="font-inter text-zinc-600 text-[10px] uppercase font-bold tracking-[0.2em]">Authorized Access Managed by Dr. Sen Memorial Trust</p>
         </div>
 
         <div className="bg-zinc-900/50 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-8 md:p-12 shadow-2xl">
           <form onSubmit={handleLogin} className="space-y-8">
-            <div className="space-y-4">
-              <label className="block font-inter font-bold text-[10px] tracking-[0.2em] text-zinc-500 uppercase px-1" htmlFor="email">Work Email</label>
-              <input 
-                required
-                type="email" 
-                id="email" 
-                placeholder="doctor@senvetcare.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-black border border-white/5 rounded-2xl px-5 py-4 font-inter text-white placeholder:text-zinc-800 focus:outline-none focus:border-primary transition-all duration-300"
-              />
-            </div>
-            <div className="space-y-4">
-              <label className="block font-inter font-bold text-[10px] tracking-[0.2em] text-zinc-500 uppercase px-1" htmlFor="password">Security Password</label>
-              <input 
-                required
-                type="password" 
-                id="password" 
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-black border border-white/5 rounded-2xl px-5 py-4 font-inter text-white placeholder:text-zinc-800 focus:outline-none focus:border-primary transition-all duration-300"
-              />
+            <div className="grid grid-cols-1 gap-8">
+              <div className="space-y-4">
+                <label className="block font-inter font-bold text-[10px] tracking-[0.2em] text-zinc-500 uppercase px-1">Login As</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {['pet-owner', 'vets', 'admin'].map((type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => setUserType(type)}
+                      className={`py-3 rounded-xl font-inter font-bold text-[9px] uppercase tracking-wider transition-all duration-300 border ${
+                        userType === type 
+                          ? 'bg-white text-black border-white shadow-[0_0_20px_rgba(255,255,255,0.15)]' 
+                          : 'bg-black/40 text-zinc-500 border-white/5 hover:border-white/20'
+                      }`}
+                    >
+                      {type.replace('-', ' ')}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <label className="block font-inter font-bold text-[10px] tracking-[0.2em] text-zinc-500 uppercase px-1" htmlFor="email">Email Address</label>
+                <input 
+                  required
+                  type="email" 
+                  id="email" 
+                  placeholder="e.g., patient@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full bg-black border border-white/5 rounded-2xl px-5 py-4 font-inter text-white placeholder:text-zinc-800 focus:outline-none focus:border-primary transition-all duration-300"
+                />
+              </div>
+
+              <div className="space-y-4">
+                <label className="block font-inter font-bold text-[10px] tracking-[0.2em] text-zinc-500 uppercase px-1" htmlFor="password">Security Password</label>
+                <input 
+                  required
+                  type="password" 
+                  id="password" 
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-black border border-white/5 rounded-2xl px-5 py-4 font-inter text-white placeholder:text-zinc-800 focus:outline-none focus:border-primary transition-all duration-300"
+                />
+              </div>
             </div>
 
             <div className="flex items-center justify-between text-[10px] font-inter font-bold uppercase tracking-widest text-zinc-600">

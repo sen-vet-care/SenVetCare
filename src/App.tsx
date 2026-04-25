@@ -18,12 +18,15 @@ import { HomePage } from './pages/HomePage';
 const StoriesPage = lazy(() => import('./pages/StoriesPage').then(m => ({ default: m.StoriesPage })));
 const PharmacyPage = lazy(() => import('./pages/PharmacyPage').then(m => ({ default: m.PharmacyPage })));
 const DiagnosticsPage = lazy(() => import('./pages/DiagnosticsPage').then(m => ({ default: m.DiagnosticsPage })));
+const TreatmentsPage = lazy(() => import('./pages/TreatmentsPage').then(m => ({ default: m.TreatmentsPage })));
+const PreventionsPage = lazy(() => import('./pages/PreventionsPage').then(m => ({ default: m.PreventionPage })));
 const PortalLoginPage = lazy(() => import('./pages/PortalLoginPage').then(m => ({ default: m.PortalLoginPage })));
 const DrLilyPage = lazy(() => import('./pages/DrLilyPage').then(m => ({ default: m.DrLilyPage })));
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage').then(m => ({ default: m.PrivacyPolicyPage })));
 const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage').then(m => ({ default: m.TermsOfServicePage })));
 const PetSafetyGuidePage = lazy(() => import('./pages/PetSafetyGuidePage').then(m => ({ default: m.PetSafetyGuidePage })));
 const CareersPage = lazy(() => import('./pages/CareersPage').then(m => ({ default: m.CareersPage })));
+const BookingPage = lazy(() => import('./pages/BookingPage').then(m => ({ default: m.BookingPage })));
 
 const SectionLoader = () => (
   <div className="w-full py-20 flex items-center justify-center">
@@ -50,12 +53,15 @@ export default function App() {
             <Route path="/stories" element={<StoriesPage />} />
             <Route path="/pharmacy" element={<PharmacyPage />} />
             <Route path="/diagnostics" element={<DiagnosticsPage />} />
+            <Route path="/treatments" element={<TreatmentsPage />} />
+            <Route path="/preventions" element={<PreventionsPage />} />
             <Route path="/dr-lily" element={<DrLilyPage />} />
             <Route path="/portal-login" element={<PortalLoginPage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
             <Route path="/terms-of-service" element={<TermsOfServicePage />} />
             <Route path="/pet-safety-guide" element={<PetSafetyGuidePage />} />
             <Route path="/careers" element={<CareersPage />} />
+            <Route path="/book" element={<BookingPage />} />
           </Routes>
         </Suspense>
 
