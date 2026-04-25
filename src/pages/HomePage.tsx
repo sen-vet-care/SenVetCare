@@ -5,6 +5,7 @@ import { OurDoctors } from '../sections/OurDoctors';
 import { Services } from '../sections/Services';
 import { AboutLegacy } from '../sections/AboutLegacy';
 import { EmergencyBooking } from '../sections/Emergency';
+import { Testimonials } from '../sections/Testimonials';
 import { ContactSupport } from '../sections/ContactSupport';
 import { Link } from 'react-router-dom';
 
@@ -41,6 +42,7 @@ export const HomePage = () => {
         <AboutLegacy />
         <Services />
         <OurDoctors />
+        <Testimonials />
         <EmergencyBooking />
         
         {/* Stories Teaser */}
@@ -54,6 +56,8 @@ export const HomePage = () => {
                 <span className="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </Link>
         </section>
+        
+        <ContactSupport />
       </Suspense>
     </main>
   );
