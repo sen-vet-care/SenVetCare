@@ -1,7 +1,18 @@
 import { GoogleGenAI } from '@google/genai';
 import { supabase } from './supabase';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let aiInstance: GoogleGenAI | null = null;
+
+const getAI = () => {
+  if (aiInstance) return aiInstance;
+  
+  const apiKey = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GEMINI_API_KEY) || 
+                 (typeof process !== 'undefined' && process.env?.GEMINI_API_KEY) || 
+                 '';
+                 
+  aiInstance = new GoogleGenAI({ apiKey });
+  return aiInstance;
+};
 
 const DR_LILY_SYSTEM_PROMPT_BASE = `
 You are Dr. Lily®, the official AI Clinical Assistant and Triage Module for Dr. Tamal B. Sen Memorial Veterinary Clinic in Kolkata.
@@ -110,6 +121,7 @@ These suggestions must be relevant to the context of the conversation.
       parts: [{ text: msg.content }]
     }));
 
+    const ai = getAI();
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: [
