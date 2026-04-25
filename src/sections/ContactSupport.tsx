@@ -2,14 +2,10 @@ import { useState, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 
 export const ContactSupport = () => {
-  const containerRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"]
-  });
+  const { scrollYProgress } = useScroll();
 
-  const cardsY = useTransform(scrollYProgress, [0, 1], [50, -50]);
-  const formY = useTransform(scrollYProgress, [0, 1], [0, -30]);
+  const cardsY = useTransform(scrollYProgress, [0, 1], [30, -30]);
+  const formY = useTransform(scrollYProgress, [0, 1], [0, -20]);
 
   const [formData, setFormData] = useState({
     // ...
@@ -47,7 +43,7 @@ export const ContactSupport = () => {
   };
 
   return (
-    <section id="contact" ref={containerRef} className="py-[120px] max-w-[1280px] mx-auto px-6 w-full">
+    <section id="contact" className="py-[120px] max-w-[1280px] mx-auto px-6 w-full">
       <div className="mb-16 max-w-2xl">
         <h2 className="font-manrope font-black text-[48px] text-ink-depth mb-4">Contact & Support</h2>
         <p className="font-inter text-[18px] text-on-surface-variant">Reach out to our clinical team for inquiries, appointments, or immediate assistance. We are here to help.</p>

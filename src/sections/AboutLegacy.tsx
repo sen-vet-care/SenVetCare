@@ -2,17 +2,13 @@ import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 
 export const AboutLegacy = () => {
-  const containerRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"]
-  });
+  const { scrollYProgress } = useScroll();
 
-  const founderY = useTransform(scrollYProgress, [0, 1], [0, -100]);
-  const textY = useTransform(scrollYProgress, [0, 1], [50, -50]);
+  const founderY = useTransform(scrollYProgress, [0, 0.5], [0, -50]);
+  const textY = useTransform(scrollYProgress, [0, 0.5], [30, -30]);
 
   return (
-    <section ref={containerRef} className="max-w-[1280px] mx-auto px-6 py-[120px] overflow-hidden">
+    <section className="max-w-[1280px] mx-auto px-6 py-[120px]">
       <motion.div 
         style={{ y: textY }}
         className="text-center max-w-3xl mx-auto space-y-6 mb-[80px]"

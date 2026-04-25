@@ -33,9 +33,9 @@ const SectionLoader = () => (
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-clinical-bg text-on-background flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-clinical-bg text-on-background flex flex-col relative">
       {/* Divine Ethereal Ambient Background */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-primary/10 blur-[150px] rounded-full mix-blend-screen animate-breathe opacity-80"></div>
         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-waiting-gold/5 blur-[120px] rounded-full mix-blend-screen animate-breathe opacity-60" style={{ animationDelay: '3s' }}></div>
       </div>

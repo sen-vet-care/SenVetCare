@@ -2,17 +2,13 @@ import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 
 export const EmergencyBooking = () => {
-  const containerRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start end", "end start"]
-  });
+  const { scrollYProgress } = useScroll();
 
-  const circle1Y = useTransform(scrollYProgress, [0, 1], [-100, 100]);
-  const circle2Y = useTransform(scrollYProgress, [0, 1], [100, -100]);
+  const circle1Y = useTransform(scrollYProgress, [0, 1], [-50, 50]);
+  const circle2Y = useTransform(scrollYProgress, [0, 1], [50, -50]);
 
   return (
-    <section ref={containerRef} id="emergency" className="py-[100px] flex flex-col items-center justify-center relative overflow-hidden bg-gradient-to-b from-error-container/30 to-background">
+    <section id="emergency" className="py-[100px] flex flex-col items-center justify-center relative bg-gradient-to-b from-error-container/30 to-background">
       {/* Decorative Background Elements */}
       <motion.div 
         style={{ y: circle1Y }}

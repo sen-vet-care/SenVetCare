@@ -16,16 +16,12 @@ const SectionLoader = () => (
 );
 
 export const HomePage = () => {
-  const containerRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
+  const { scrollYProgress } = useScroll();
 
   const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
 
   return (
-    <main ref={containerRef} className="flex-grow relative overflow-hidden">
+    <main className="flex-grow relative">
       {/* Dynamic Parallax Background Elements */}
       <motion.div 
         style={{ y: bgY }}

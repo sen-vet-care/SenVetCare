@@ -41,15 +41,10 @@ const CAROUSEL_PHOTOS = [
 
 export const HeroReception = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const containerRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end start"]
-  });
+  const { scrollYProgress } = useScroll();
 
-  const textY = useTransform(scrollYProgress, [0, 1], [0, 200]);
-  const imageY = useTransform(scrollYProgress, [0, 1], [0, -100]);
-  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const textY = useTransform(scrollYProgress, [0, 0.5], [0, 100]);
+  const imageY = useTransform(scrollYProgress, [0, 0.5], [0, -50]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -61,13 +56,12 @@ export const HeroReception = () => {
   return (
     <section 
       id="reception" 
-      ref={containerRef}
       className="min-h-screen pt-32 pb-20 px-4 md:px-8 max-w-[1280px] mx-auto w-full flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-20 relative z-10"
     >
       
       {/* Left: Divine Messaging */}
       <motion.div 
-        style={{ y: textY, opacity }}
+        style={{ y: textY }}
         className="w-full lg:w-1/2 flex flex-col items-start pt-10 lg:pt-0"
       >
         <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full sanctuary-card mb-8 border border-waiting-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.1)]">
