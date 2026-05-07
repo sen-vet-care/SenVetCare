@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 
 export const TreatmentsPage = () => {

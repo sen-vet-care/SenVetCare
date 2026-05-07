@@ -6,7 +6,7 @@ const SERVICES_DATA = [
     id: 'consultation',
     name: 'Clinical Consultation',
     description: 'Comprehensive physical examination covering vital signs, nutritional assessment, and preventative health screenings.',
-    price: '₹600 - ₹800',
+    price: 'Rs.600 - Rs.800',
     type: 'Single Service',
     features: ['Detailed history review', 'Vitals check', 'Customized care plan', 'Follow-up scheduling']
   },
@@ -14,7 +14,7 @@ const SERVICES_DATA = [
     id: 'vaccination',
     name: 'Annual Immunization Shield',
     description: 'Complete vaccination protocols safeguarding against Rabies, Parvovirus, Distemper, and regional endemic threats.',
-    price: 'From ₹1,200',
+    price: 'From Rs.1,200',
     type: 'Treatment Package',
     features: ['Multi-valent vaccines', 'Deworming included', 'Digital records update', 'Immunity certification']
   },
@@ -30,7 +30,7 @@ const SERVICES_DATA = [
     id: 'dental',
     name: 'Ultrasonic Dental Prophylaxis',
     description: 'Premium dental scaling, polishing, and oral health assessment to prevent systemic diseases rooted in periodontal infections.',
-    price: 'From ₹2,500',
+    price: 'From Rs.2,500',
     type: 'Treatment Package',
     features: ['Ultrasonic scaling', 'Enamel polishing', 'Gingival health check', 'At-home care kit']
   }

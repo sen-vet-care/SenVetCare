@@ -79,7 +79,7 @@ export const AdminServices = () => {
             </div>
             <div className="flex items-center gap-6 shrink-0">
               <div className="text-right">
-                <p className="font-bold text-emerald-600 text-lg">${s.rate}</p>
+                <p className="font-bold text-emerald-600 text-lg">Rs.{s.rate}</p>
                 <p className="text-xs text-zinc-500 uppercase tracking-wider">{s.unit}</p>
               </div>
               <div className="flex items-center gap-2">
