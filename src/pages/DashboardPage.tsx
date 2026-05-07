@@ -32,14 +32,16 @@ export const DashboardPage = () => {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         if (userDoc.exists()) {
           const data = userDoc.data();
-          setUserRole(data.role || 'pet-owner');
+          const isAdminEmail = ['senvetcare@gmail.com', 'contact@senvetcare.com', 'drtbsmemorialvetclinic@gmail.com'].includes(user.email?.toLowerCase() || '');
+          const role = isAdminEmail ? 'admin' : (data.role || 'pet-owner');
+          setUserRole(role);
           setUserName(user.displayName || data.email?.split('@')[0] || 'User');
           
-          if (data.role === 'pet-owner' || !data.role) {
+          if (role === 'pet-owner') {
             const q = query(collection(db, 'pets'), where('ownerId', '==', user.uid));
             const petSnaps = await getDocs(q);
             setPetsCount(petSnaps.size);
-          } else if (data.role === 'admin') {
+          } else if (role === 'admin') {
             const settingsDoc = await getDoc(doc(db, 'settings', 'config'));
             if (settingsDoc.exists()) {
                setNotificationsEnabled(settingsDoc.data().notificationsEnabled ?? true);
@@ -47,8 +49,8 @@ export const DashboardPage = () => {
             }
           }
         } else {
-           // Default to pet-owner if no profile exists
-           setUserRole('pet-owner');
+           const isAdminEmail = ['senvetcare@gmail.com', 'contact@senvetcare.com', 'drtbsmemorialvetclinic@gmail.com'].includes(user.email?.toLowerCase() || '');
+           setUserRole(isAdminEmail ? 'admin' : 'pet-owner');
            setUserName(user.displayName || user.email?.split('@')[0] || 'User');
         }
       } catch (err) {
@@ -98,7 +100,7 @@ export const DashboardPage = () => {
                 auth.signOut();
                 navigate('/');
               }}
-              className="px-6 py-3 bg-white hover:bg-zinc-50 border border-outline-variant text-ink-depth rounded-full font-inter font-bold text-xs uppercase tracking-widest transition-colors flex items-center gap-2 shadow-sm"
+              className="px-6 py-3 bg-white hover:bg-zinc-200 border border-outline-variant text-black rounded-full font-inter font-bold text-xs uppercase tracking-widest transition-colors flex items-center gap-2 shadow-sm"
             >
               Sign Out
               <span className="material-symbols-outlined text-sm">logout</span>
@@ -262,34 +264,36 @@ export const DashboardPage = () => {
                 </div>
 
                 {/* Dr Lily AI Insight Widget */}
-                <div className="bg-gradient-to-br from-zinc-900 to-black rounded-[2rem] p-8 shadow-xl text-white relative overflow-hidden">
-                   <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full mix-blend-screen pointer-events-none"></div>
-                   <div className="flex items-center gap-3 mb-6">
-                     <span className="material-symbols-outlined text-emerald-400">smart_toy</span>
-                     <h3 className="font-manrope font-bold text-xl">Dr Lily AI Insights</h3>
-                   </div>
-                   
-                   <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
-                     <p className="font-inter text-zinc-300 text-sm leading-relaxed italic">
-                       "Hello {userName}, based on regional data, there is a spike in tick-borne illnesses this week. 
-                       Ensure your pets are up to date on preventatives before scheduling walks in wooded areas."
-                     </p>
-                     <div className="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
-                       <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">System generated alert</p>
-                       {userRole === 'pet-owner' ? (
-                         <button onClick={() => navigate('/dr-lily')} className="text-emerald-400 hover:text-emerald-300 text-sm font-bold flex items-center gap-1 transition-colors">
-                           Ask Dr. Lily
-                           <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                         </button>
-                       ) : (
-                         <button onClick={() => navigate('/dr-lily')} className="text-emerald-400 hover:text-emerald-300 text-sm font-bold flex items-center gap-1 transition-colors">
-                           Analyze Symptoms
-                           <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                         </button>
-                       )}
+                {userRole !== 'admin' && (
+                  <div className="bg-gradient-to-br from-zinc-900 to-black rounded-[2rem] p-8 shadow-xl text-white relative overflow-hidden">
+                     <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full mix-blend-screen pointer-events-none"></div>
+                     <div className="flex items-center gap-3 mb-6">
+                       <span className="material-symbols-outlined text-emerald-400">smart_toy</span>
+                       <h3 className="font-manrope font-bold text-xl">Dr Lily AI Insights</h3>
                      </div>
-                   </div>
-                </div>
+                     
+                     <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
+                       <p className="font-inter text-zinc-300 text-sm leading-relaxed italic">
+                         "Hello {userName}, based on regional data, there is a spike in tick-borne illnesses this week. 
+                         Ensure your pets are up to date on preventatives before scheduling walks in wooded areas."
+                       </p>
+                       <div className="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
+                         <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">System generated alert</p>
+                         {userRole === 'pet-owner' ? (
+                           <button onClick={() => navigate('/dr-lily')} className="text-emerald-400 hover:text-emerald-300 text-sm font-bold flex items-center gap-1 transition-colors">
+                             Ask Dr. Lily
+                             <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                           </button>
+                         ) : (
+                           <button onClick={() => navigate('/dr-lily')} className="text-emerald-400 hover:text-emerald-300 text-sm font-bold flex items-center gap-1 transition-colors">
+                             Analyze Symptoms
+                             <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                           </button>
+                         )}
+                       </div>
+                     </div>
+                  </div>
+                )}
               </div>
             </>
           )}

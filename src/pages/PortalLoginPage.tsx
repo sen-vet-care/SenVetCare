@@ -275,6 +275,23 @@ export const PortalLoginPage = () => {
               </svg>
               Google
             </button>
+            <div className="mt-6 text-center">
+              {!isSignUp ? (
+                <p className="font-inter text-xs text-zinc-400">
+                  Don't have an account?{' '}
+                  <button type="button" onClick={() => setIsSignUp(true)} className="text-emerald-400 font-bold hover:underline">
+                    Sign up for free
+                  </button>
+                </p>
+              ) : (
+                <p className="font-inter text-xs text-zinc-400">
+                  Already have an account?{' '}
+                  <button type="button" onClick={() => setIsSignUp(false)} className="text-emerald-400 font-bold hover:underline">
+                    Sign in
+                  </button>
+                </p>
+              )}
+            </div>
           </form>
 
           <div className="mt-12 text-center">

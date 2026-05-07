@@ -59,7 +59,13 @@ export default function App() {
     return () => unsub();
   }, []);
 
-  if (webAccessEnabled === false && !location.pathname.startsWith('/dashboard') && !location.pathname.startsWith('/portal-login')) {
+  if (webAccessEnabled === false && 
+      !location.pathname.startsWith('/dashboard') && 
+      !location.pathname.startsWith('/portal-login') &&
+      location.pathname !== '/' &&
+      location.pathname !== '/privacy-policy' &&
+      location.pathname !== '/terms-of-service'
+  ) {
      return (
        <div className="min-h-screen bg-clinical-bg flex items-center justify-center text-center p-6">
          <div>

@@ -123,19 +123,19 @@ Initial Issue: ${petData.problemDescription}
       }
     }
     
-    if (process.env.MISTRAL_API_KEY) {
-      try {
-        return await getTriageNextStepMistral(systemContext, history);
-      } catch (mistralError) {
-        console.error("Mistral AI Error:", mistralError);
-      }
-    }
-    
     if (process.env.NVIDIA_API_KEY) {
       try {
         return await getTriageNextStepNvidia(systemContext, history);
       } catch (nvidiaError) {
         console.error("Nvidia AI Error:", nvidiaError);
+      }
+    }
+
+    if (process.env.MISTRAL_API_KEY) {
+      try {
+        return await getTriageNextStepMistral(systemContext, history);
+      } catch (mistralError) {
+        console.error("Mistral AI Error:", mistralError);
       }
     }
     

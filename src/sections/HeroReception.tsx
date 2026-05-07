@@ -76,12 +76,12 @@ export const HeroReception = () => {
           className="w-full lg:w-2/3 flex flex-col items-start"
         >
           <div className="flex flex-col items-start gap-4 px-6 py-4 rounded-[2rem] sanctuary-card mb-8 border border-white/10 shadow-[0_0_30px_rgba(255,255,255,0.05)] bg-black/40 backdrop-blur-md">
-            <h2 className="font-manrope font-extrabold text-3xl md:text-4xl text-white tracking-tight drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
-              SenVetCare
+            <h2 className="font-manrope font-extrabold text-2xl md:text-3xl text-white tracking-tight drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
+              Sen Vet Care - Best Vet Clinic in Kolkata
             </h2>
             <div className="flex flex-col gap-1">
-               <span className="font-inter font-bold text-xs tracking-[0.3em] text-waiting-gold uppercase drop-shadow-[0_0_8px_rgba(212,175,55,0.4)]">Legacy</span>
-               <span className="font-inter font-bold text-xs tracking-[0.2em] text-emerald-400 uppercase drop-shadow-[0_0_8px_rgba(52,211,153,0.4)]">Dr. T. B. Sen Memorial Veterinary Clinic</span>
+               <span className="font-inter font-bold text-xs tracking-[0.3em] text-waiting-gold uppercase drop-shadow-[0_0_8px_rgba(212,175,55,0.4)]">Legacy Of</span>
+               <span className="font-inter font-bold text-[10px] tracking-[0.2em] text-emerald-400 uppercase drop-shadow-[0_0_8px_rgba(52,211,153,0.4)]">Dr. T. B. Sen Memorial Veterinary Clinic</span>
             </div>
           </div>
           
