@@ -3,7 +3,6 @@ import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { Link } from 'react-router-dom';
 
 const CAROUSEL_PHOTOS = [
-  "https://ik.imagekit.io/senvetcare/2025-12-14%20(1).webp?updatedAt=1776251360784",
   "https://ik.imagekit.io/senvetcare/2024-12-15.webp?updatedAt=1776251360726",
   "https://ik.imagekit.io/senvetcare/unnamed%20(4).webp?updatedAt=1776251360701",
   "https://ik.imagekit.io/senvetcare/unnamed.webp?updatedAt=1776251360661",
