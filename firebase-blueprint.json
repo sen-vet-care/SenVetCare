@@ -20,9 +20,33 @@
         "name": { "type": "string" },
         "specialty": { "type": "string" },
         "image_url": { "type": "string" },
-        "availability_status": { "type": "string" }
+        "availability_status": { "type": "string" },
+        "timings": { "type": "string" },
+        "isPresent": { "type": "boolean" }
       },
       "required": ["name"]
+    },
+    "Service": {
+      "title": "Service",
+      "description": "A clinic service",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "rate": { "type": "number" },
+        "unit": { "type": "string" }
+      },
+      "required": ["name", "rate"]
+    },
+    "AppSetting": {
+      "title": "App Setting",
+      "description": "System wide settings",
+      "type": "object",
+      "properties": {
+        "notificationsEnabled": { "type": "boolean" },
+        "webAccessEnabled": { "type": "boolean" }
+      },
+      "required": ["webAccessEnabled"]
     },
     "Blog": {
       "title": "Blog",
@@ -85,6 +109,14 @@
     "/medical_records/{recordId}": {
       "schema": { "$ref": "#/entities/MedicalRecord" },
       "description": "Medical records and appointments"
+    },
+    "/services/{serviceId}": {
+      "schema": { "$ref": "#/entities/Service" },
+      "description": "Clinic services"
+    },
+    "/settings/{settingId}": {
+      "schema": { "$ref": "#/entities/AppSetting" },
+      "description": "App settings"
     }
   }
 }

@@ -3,13 +3,15 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { DrLilyWidget } from './components/ui/DrLilyWidget';
 import { WhatsAppFloatingButton } from './components/ui/WhatsAppFloatingButton';
 import ScrollToTop from './components/ui/ScrollToTop';
+import { db } from './services/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 
 // Import pages
 import { HomePage } from './pages/HomePage';
@@ -39,6 +41,39 @@ const SectionLoader = () => (
 );
 
 export default function App() {
+  const [webAccessEnabled, setWebAccessEnabled] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, 'settings', 'config'), (docSnap) => {
+      if (docSnap.exists()) {
+         setWebAccessEnabled(docSnap.data().webAccessEnabled ?? true);
+      } else {
+         setWebAccessEnabled(true);
+      }
+    }, (error) => {
+      console.error("Failed to fetch settings config limit or blocked:", error);
+      // Fallback to true so we don't break for non-logged in users when rules block settings
+      setWebAccessEnabled(true);
+    });
+    return () => unsub();
+  }, []);
+
+  if (webAccessEnabled === false) {
+     return (
+       <div className="min-h-screen bg-clinical-bg flex items-center justify-center text-center p-6">
+         <div>
+           <div className="text-red-500 mb-6 flex justify-center">
+             <span className="material-symbols-outlined text-6xl">cloud_off</span>
+           </div>
+           <h1 className="font-manrope text-3xl font-bold text-ink-depth mb-4">Website Currently Unavailable</h1>
+           <p className="font-inter text-on-surface-variant max-w-md mx-auto">
+             The SEN VET CARE clinic web application is currently disabled by the administrators. Please try again later or contact the clinic directly.
+           </p>
+         </div>
+       </div>
+     );
+  }
+
   return (
     <div className="min-h-screen bg-clinical-bg text-on-background flex flex-col relative">
       {/* Divine Ethereal Ambient Background */}

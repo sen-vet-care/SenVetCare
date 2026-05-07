@@ -8,7 +8,14 @@ service cloud.firestore {
     function isSignedIn() { return request.auth != null; }
     function incoming() { return request.resource.data; }
     function existing() { return resource.data; }
-    function isAdmin() { return isSignedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+    function isAdmin() { 
+      return isSignedIn() && (
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' || 
+        request.auth.token.email == 'contact@senvetcare.com' ||
+        request.auth.token.email == 'senvetcare@gmail.com' ||
+        request.auth.token.email == 'drtbsmemorialvetclinic@gmail.com'
+      ); 
+    }
     function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
     function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
 
@@ -35,15 +42,25 @@ service cloud.firestore {
       allow list: if isAdmin();
       allow create: if isOwner(userId)
                     && isValidId(userId)
-                    && data.keys().size() >= 1
                     && isValidUser(incoming());
       allow update: if isOwner(userId)
-                    && isValidUser(incoming())
-                    && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'email']);
+                    && isValidUser(incoming());
       allow delete: if isAdmin();
     }
 
     match /doctors/{doctorId} {
+      allow get: if true;
+      allow list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /services/{serviceId} {
+      allow get: if true;
+      allow list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    match /settings/{settingId} {
       allow get: if true;
       allow list: if true;
       allow create, update, delete: if isAdmin();
