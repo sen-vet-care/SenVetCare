@@ -71,13 +71,6 @@ export const Footer = () => {
                       <a href="tel:+919871155162" className="text-white text-lg font-bold hover:text-primary transition-colors tracking-tight">+91 98711 55162</a>
                     </div>
                     <div className="group cursor-default">
-                      <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-2 group-hover:text-zinc-300 transition-colors">WhatsApp 24/7</p>
-                      <a href="https://wa.me/message/EOOITVOJLIHNO1" className="text-emerald-500 text-sm font-bold hover:brightness-125 transition-all flex items-center gap-2">
-                        Message Dispatch
-                        <span className="material-symbols-outlined text-sm">north_east</span>
-                      </a>
-                    </div>
-                    <div className="group cursor-default">
                       <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-2 group-hover:text-zinc-300 transition-colors">Clinical Liaison</p>
                       <a href="mailto:contact@senvetcare.com" className="text-white text-sm font-medium hover:text-primary transition-colors">contact@senvetcare.com</a>
                     </div>
@@ -156,14 +149,14 @@ export const Footer = () => {
         {/* Legal & Credits Line */}
         <div className="pt-20 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-12">
           <div className="flex items-center gap-6">
-            <span className="text-[10px] font-black text-zinc-800 uppercase tracking-widest">© {new Date().getFullYear()} SEN-MEMORIAL-UNIT</span>
+            <span className="text-[10px] font-black text-zinc-800 uppercase tracking-widest">© 2021 sen vet care unit</span>
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)] animate-pulse"></div>
             <Link to="/portal-login" className="text-[10px] font-bold text-zinc-600 hover:text-primary transition-colors uppercase tracking-[0.2em]">Protocol Login</Link>
           </div>
           
           <div className="flex items-center gap-8">
             <p className="text-[10px] font-medium text-zinc-600 uppercase tracking-[0.25em]">
-              Curated by <span className="text-zinc-400 text-xs italic font-serif lowercase tracking-normal">Lily AI Unit</span>
+              Developed with care by <a href="https://www.zoethehappiness.com" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-primary transition-colors font-bold tracking-widest lowercase">Zoe</a>
             </p>
           </div>
         </div>

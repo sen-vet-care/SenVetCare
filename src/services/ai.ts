@@ -1,5 +1,4 @@
 import { GoogleGenAI } from '@google/genai';
-import { supabase } from './supabase';
 
 let aiInstance: GoogleGenAI | null = null;
 

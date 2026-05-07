@@ -14,6 +14,9 @@ import ScrollToTop from './components/ui/ScrollToTop';
 // Import pages
 import { HomePage } from './pages/HomePage';
 
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
+
 // Lazy load other pages
 const StoriesPage = lazy(() => import('./pages/StoriesPage').then(m => ({ default: m.StoriesPage })));
 const PharmacyPage = lazy(() => import('./pages/PharmacyPage').then(m => ({ default: m.PharmacyPage })));
@@ -68,6 +71,8 @@ export default function App() {
         <DrLilyWidget />
         <WhatsAppFloatingButton />
         <Footer />
+        <Analytics />
+        <SpeedInsights />
       </div>
     </div>
   );

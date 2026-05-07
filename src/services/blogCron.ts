@@ -1,5 +1,62 @@
 import { GoogleGenAI } from "@google/genai";
-import { supabase } from "./supabase";
+import admin from "firebase-admin";
+import firebaseConfig from "../../firebase-applet-config.json";
+
+if (!admin.apps.length) {
+  if (process.env.FIREBASE_PRIVATE_KEY) {
+    admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: process.env.FIREBASE_PROJECT_ID || firebaseConfig.projectId,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      }),
+      projectId: process.env.FIREBASE_PROJECT_ID || firebaseConfig.projectId,
+    });
+  } else {
+    admin.initializeApp({
+      projectId: firebaseConfig.projectId,
+    });
+  }
+  const adminDb = admin.firestore();
+  adminDb.settings({
+    databaseId: firebaseConfig.firestoreDatabaseId,
+    ignoreUndefinedProperties: true
+  });
+}
+const adminDb = admin.firestore();
+
+export enum OperationType {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  LIST = 'list',
+  GET = 'get',
+  WRITE = 'write',
+}
+
+export interface FirestoreErrorInfo {
+  error: string;
+  operationType: OperationType;
+  path: string | null;
+  authInfo: {
+    userId?: string | null;
+    email?: string | null;
+  }
+}
+
+export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const errInfo: FirestoreErrorInfo = {
+    error: error instanceof Error ? error.message : String(error),
+    authInfo: {
+      userId: null,
+      email: null
+    },
+    operationType,
+    path
+  }
+  console.error('Firestore Error: ', JSON.stringify(errInfo));
+  throw new Error(JSON.stringify(errInfo));
+}
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
@@ -36,27 +93,23 @@ Do not include any other markdown or wrappers, just valid JSON.
     const category = parsed.category || "General News";
     const content = parsed.content || "Daily updates loading...";
 
-    // Insert into Supabase
-    // If table doesn't exist, this might fail unless we assume it's created or we mock it.
-    // Assuming there's a 'blogs' table or we just log it if we can't run it right now.
-    // Actually the user asks to "autopopulate... and will be stored in supabase free tier".
-    const { data, error } = await supabase.from('blogs').insert([{
-      title,
-      excerpt,
-      category,
-      content,
-      language: "EN",
-      is_featured: false,
-      published_at: new Date().toISOString()
-    }]);
-
-    if (error) {
-      console.error("Supabase insert error:", error);
-      throw error;
+    try {
+      const docRef = await adminDb.collection('blogs').add({
+        title,
+        excerpt,
+        category,
+        content,
+        image_url: `https://image.pollinations.ai/prompt/${encodeURIComponent(title + " pet care realistic high quality photo")}?width=800&height=400&nologo=true`,
+        language: "EN",
+        is_featured: false,
+        published_at: new Date().toISOString()
+      });
+      console.log("Successfully generated and stored blog:", title);
+      return { id: docRef.id };
+    } catch (e) {
+      handleFirestoreError(e, OperationType.CREATE, 'blogs');
     }
 
-    console.log("Successfully generated and stored blog:", title);
-    return data;
   } catch (error) {
     console.error("Failed to generate blog:", error);
     throw error;

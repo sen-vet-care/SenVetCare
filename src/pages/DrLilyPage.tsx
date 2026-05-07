@@ -1099,20 +1099,33 @@ export const DrLilyPage = () => {
                            const element = document.getElementById('lily-report-content');
                            if (!element) return;
                            
-                           // Dynamically import as it's a large library
-                           import('html2pdf.js').then((html2pdf) => {
-                             const opt = {
-                               margin: [10, 10, 10, 10],
-                               filename: `DrLily-Report-${formData.petName}-${new Date().getTime()}.pdf`,
-                               image: { type: 'jpeg', quality: 0.98 },
-                               html2canvas: { scale: 2, useCORS: true, backgroundColor: '#0D0D0F' },
-                               jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                             };
-                             
-                             html2pdf.default().from(element).set(opt).save();
+                           // Dynamically import to avoid slowing down initial load
+                           Promise.all([
+                             import('html-to-image'),
+                             import('jspdf')
+                           ]).then(([htmlToImage, jsPDFModule]) => {
+                             htmlToImage.toPng(element, { 
+                               cacheBust: true, 
+                               backgroundColor: '#0D0D0F',
+                               pixelRatio: 2 // Higher quality
+                             })
+                               .then((dataUrl) => {
+                                 const jsPDF = jsPDFModule.jsPDF;
+                                 const pdf = new jsPDF('p', 'mm', 'a4');
+                                 const margin = 10;
+                                 const pdfWidth = pdf.internal.pageSize.getWidth() - (margin * 2);
+                                 const pdfHeight = (element.offsetHeight * pdfWidth) / element.offsetWidth;
+                                 
+                                 pdf.addImage(dataUrl, 'PNG', margin, margin, pdfWidth, pdfHeight);
+                                 pdf.save(`DrLily-Report-${formData.petName}-${new Date().getTime()}.pdf`);
+                               })
+                               .catch((err) => {
+                                 console.error("PDF generation error:", err);
+                                 alert("Error generating PDF. Please try again.");
+                               });
                            }).catch(err => {
-                             console.error("PDF generation error:", err);
-                             alert("Error generating PDF. Please try again.");
+                             console.error("PDF generator library load error:", err);
+                             alert("Error loading PDF generator.");
                            });
                          }}
                          className="p-8 bg-[#6EE7B7] text-[#0D0D0F] rounded-2xl flex flex-col items-center gap-4 hover:bg-[#4ADBA0] transition-all transform hover:scale-105 shadow-xl min-w-[240px]"

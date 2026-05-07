@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
-import { supabase } from '../services/supabase';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../services/firebase';
 
 const DoctorCard = ({ doc, idx }: { doc: any, idx: number }) => {
   const cardRef = useRef<HTMLDivElement>(null);
@@ -59,11 +60,11 @@ export const OurDoctors = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const { data, error } = await supabase.from('doctors').select('*');
-        if (error) throw error;
+        const querySnapshot = await getDocs(collection(db, 'doctors'));
+        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setDoctors(data || []);
       } catch (err) {
-        console.error("Error fetching doctors:", err);
+        console.warn("Error fetching doctors collection:", err);
       } finally {
         setLoading(false);
       }

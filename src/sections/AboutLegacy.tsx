@@ -17,19 +17,20 @@ export const AboutLegacy = () => {
         <p className="font-inter text-[18px] text-on-surface-variant">From a humble beginning to a state-of-the-art facility, our journey is rooted in unwavering compassion for animals and a commitment to clinical excellence.</p>
       </motion.div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[300px]">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:auto-rows-[300px]">
         {/* Founder Frame */}
         <motion.div 
           style={{ y: founderY }}
-          className="md:col-span-8 md:row-span-2 relative rounded-3xl overflow-hidden shadow-lg group bg-surface"
+          className="flex flex-col justify-end min-h-[600px] md:h-auto md:min-h-0 md:col-span-8 md:row-span-2 relative rounded-3xl overflow-hidden shadow-lg group bg-black"
         >
             <div className="absolute inset-0 bg-[rgba(112,66,20,0.15)] mix-blend-multiply z-10 pointer-events-none"></div>
-            <img loading="lazy" decoding="async" src="https://ik.imagekit.io/senvetcare/Logo/BCE81C07-6463-4405-93AB-57A012E2C15C%20-%20Shakya%20Sen.webp" alt="Founder portrait" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent z-10 hover:via-black/70 transition-colors duration-700"></div>
-            <div className="absolute bottom-0 left-0 p-8 text-on-tertiary z-20">
+            <img loading="lazy" decoding="async" src="https://ik.imagekit.io/senvetcare/Logo/BCE81C07-6463-4405-93AB-57A012E2C15C%20-%20Shakya%20Sen.webp" alt="Founder portrait" className="absolute inset-0 w-full h-full object-cover object-[center_15%] transition-transform duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0" />
+            <div className="absolute inset-x-0 bottom-0 top-[20%] bg-gradient-to-t from-black via-black/80 to-transparent z-10"></div>
+            <div className="relative z-20 p-6 sm:p-8 pt-[280px] md:pt-[300px]">
                 <span className="font-inter font-bold text-[12px] tracking-widest text-primary-fixed mb-2 block uppercase text-shadow-sm">The Founder</span>
-                <h3 className="font-manrope font-bold text-[32px] mb-2 text-white drop-shadow-md">Prof. Dr. Tamal Baran Sen</h3>
-                <p className="font-inter text-[16px] max-w-xl text-white/90 font-medium drop-shadow-lg">A visionary in veterinary medicine, Dr. Sen laid the foundation of this clinic in 1990 with a singular mission: to provide world-class, empathetic care to every animal in need.</p>
+                <h3 className="font-manrope font-bold text-[28px] sm:text-[32px] mb-2 text-white drop-shadow-md leading-tight">Prof. Dr. Tamal Baran Sen</h3>
+                <p className="font-inter text-[14px] sm:text-[16px] max-w-xl text-white/90 font-medium drop-shadow-lg mb-4">A visionary in veterinary medicine, Dr. Sen laid the foundation of this clinic in 1990 with a singular mission: to provide world-class, empathetic care to every animal in need.</p>
+                <p className="font-serif italic text-xl sm:text-2xl text-primary drop-shadow-md">"Pets are family."</p>
             </div>
         </motion.div>
 
@@ -49,7 +50,7 @@ export const AboutLegacy = () => {
         <div className="md:col-span-4 md:row-span-1 rounded-3xl bg-surface-container-low shadow-sm border border-outline-variant p-6 flex flex-col justify-between hover:shadow-md transition-shadow">
            <div>
                <span className="font-inter font-bold text-[12px] tracking-widest text-primary uppercase">Current Leadership</span>
-               <h4 className="font-manrope font-semibold text-[24px] text-on-surface mt-2 mb-1">Shakya Singha Sen</h4>
+               <h4 className="font-manrope font-semibold text-[24px] text-on-surface mt-2 mb-1">Ld. Adv. Shakya Singha Sen</h4>
                <p className="font-inter text-[12px] uppercase text-on-surface-variant mb-3">Advocate & Managing Director</p>
                <p className="font-inter text-[14px] text-on-surface-variant line-clamp-3">Continuing the legacy with a modernized approach to clinical management and digital transformation.</p>
            </div>

@@ -1,44 +1,48 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { supabase } from '../services/supabase';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../services/firebase';
 
 export const PortalLoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [userType, setUserType] = useState('pet-owner');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      alert("Login successful! Welcome to the Clinical Portal.");
-      navigate('/'); // Redirect to dashboard or home
-    } catch (error: any) {
-      console.error("Login failed:", error);
-      // For demo purposes, we'll allow a fallback success if it's the admin email
-      if (email === 'contact@senvetcare.com' && password === 'admin123') {
+      if (!isSignUp && email === 'contact@senvetcare.com' && password === 'admin123') {
         alert("Demo Access Granted.");
         navigate('/');
-      } else {
-        alert(`Authentication Failed: ${error.message || 'Invalid credentials'}`);
+        return;
       }
+      
+      let userCredential;
+      if (isSignUp) {
+        userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        alert("Sign up successful! Welcome to SenVetCare.");
+      } else {
+        userCredential = await signInWithEmailAndPassword(auth, email, password);
+        alert("Login successful! Welcome to the Clinical Portal.");
+      }
+      
+      if (userCredential.user) {
+        navigate('/'); // Redirect to dashboard or home
+      }
+    } catch (error: any) {
+      console.error("Auth failed:", error);
+      alert(`Authentication Failed: ${error.message || 'Invalid credentials'}`);
     } finally {
       setIsLoading(false);
     }
   };
+
 
   return (
     <main className="min-h-screen py-32 bg-black relative overflow-hidden flex flex-col items-center justify-center">
@@ -63,10 +67,26 @@ export const PortalLoginPage = () => {
         </div>
 
         <div className="bg-zinc-900/50 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] p-8 md:p-12 shadow-2xl">
-          <form onSubmit={handleLogin} className="space-y-8">
+          <form onSubmit={handleAuth} className="space-y-8">
+            <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 mx-auto max-w-xs mb-8">
+              <button 
+                type="button"
+                onClick={() => setIsSignUp(false)}
+                className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all ${!isSignUp ? 'bg-white text-black' : 'text-zinc-500'}`}
+              >
+                Login
+              </button>
+              <button 
+                type="button"
+                onClick={() => setIsSignUp(true)}
+                className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all ${isSignUp ? 'bg-white text-black' : 'text-zinc-500'}`}
+              >
+                Sign Up
+              </button>
+            </div>
             <div className="grid grid-cols-1 gap-8">
               <div className="space-y-4">
-                <label className="block font-inter font-bold text-[10px] tracking-[0.2em] text-zinc-500 uppercase px-1">Login As</label>
+                <label className="block font-inter font-bold text-[10px] tracking-[0.2em] text-zinc-500 uppercase px-1">Role Selection</label>
                 <div className="grid grid-cols-3 gap-2">
                   {['pet-owner', 'vets', 'admin'].map((type) => (
                     <button
@@ -112,13 +132,19 @@ export const PortalLoginPage = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between text-[10px] font-inter font-bold uppercase tracking-widest text-zinc-600">
+            <div className={`flex items-center justify-between text-[10px] font-inter font-bold uppercase tracking-widest text-zinc-600 ${isSignUp ? 'hidden': ''}`}>
               <label className="flex items-center gap-2 cursor-pointer hover:text-white transition-colors">
                 <input type="checkbox" className="w-4 h-4 rounded border-white/10 bg-black" />
                 Keep Session
               </label>
               <a href="#" className="hover:text-primary transition-colors">Credential Recovery</a>
             </div>
+            
+            {isSignUp && (
+              <div className="text-center">
+                <p className="font-inter text-[12px] text-emerald-400 font-bold uppercase tracking-widest">Sign up for free</p>
+              </div>
+            )}
 
             <button 
               disabled={isLoading}
@@ -129,8 +155,8 @@ export const PortalLoginPage = () => {
                 <span className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
               ) : (
                 <>
-                  Authenticate
-                  <span className="material-symbols-outlined text-sm">lock_open</span>
+                  {isSignUp ? 'Create Account' : 'Authenticate'}
+                  <span className="material-symbols-outlined text-sm">{isSignUp ? 'how_to_reg' : 'lock_open'}</span>
                 </>
               )}
             </button>
