@@ -5,6 +5,12 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithP
 import { auth, db } from '../services/firebase';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
+const ADMIN_EMAILS = [
+  'drtbsmemorialvetclinic@gmail.com',
+  'senvetcare@gmail.com',
+  'contact@senvetcare.com'
+];
+
 export const PortalLoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,6 +26,16 @@ export const PortalLoginPage = () => {
       const userCredential = await signInWithPopup(auth, provider);
       
       if (userCredential.user) {
+        const userEmail = userCredential.user.email?.toLowerCase();
+        let finalRole = userType;
+        
+        if (userEmail && ADMIN_EMAILS.includes(userEmail)) {
+          finalRole = 'admin';
+        } else if (userType === 'admin') {
+          alert('You are not authorized to create an admin account. Defaulting to pet-owner.');
+          finalRole = 'pet-owner';
+        }
+        
         // Save user data to Firestore
         const userRef = doc(db, 'users', userCredential.user.uid);
         const userSnap = await getDoc(userRef);
@@ -28,15 +44,16 @@ export const PortalLoginPage = () => {
           // It's a new user
           await setDoc(userRef, {
             email: userCredential.user.email,
-            role: userType, // Assign the role they selected when they signed in with Google
+            role: finalRole, // Assign the resolved role
             createdAt: serverTimestamp(),
             lastLoginAt: serverTimestamp(),
           });
           alert("Sign up successful! Welcome to SenVetCare.");
         } else {
-          // Existing user, update last login
+          // Existing user, update last login and ensure role is updated if they are an admin
           await setDoc(userRef, {
             lastLoginAt: serverTimestamp(),
+            ...(userEmail && ADMIN_EMAILS.includes(userEmail) ? { role: 'admin' } : {})
           }, { merge: true });
           alert("Login successful! Welcome to the Clinical Portal.");
         }
@@ -61,6 +78,16 @@ export const PortalLoginPage = () => {
         navigate('/dashboard');
         return;
       }
+
+      const userEmail = email.toLowerCase();
+      let finalRole = userType;
+      
+      if (ADMIN_EMAILS.includes(userEmail)) {
+        finalRole = 'admin';
+      } else if (userType === 'admin') {
+        alert("You are not authorized to create an admin account. Defaulting to pet-owner.");
+        finalRole = 'pet-owner';
+      }
       
       let userCredential;
       if (isSignUp) {
@@ -69,7 +96,7 @@ export const PortalLoginPage = () => {
         const userRef = doc(db, 'users', userCredential.user.uid);
         await setDoc(userRef, {
             email: userCredential.user.email,
-            role: userType, 
+            role: finalRole, 
             createdAt: serverTimestamp(),
             lastLoginAt: serverTimestamp(),
         });
@@ -83,13 +110,15 @@ export const PortalLoginPage = () => {
         if (!userSnap.exists()) {
              await setDoc(userRef, {
                 email: userCredential.user.email,
-                role: userType, 
+                role: finalRole, 
                 createdAt: serverTimestamp(),
                 lastLoginAt: serverTimestamp(),
              });
         } else {
+            // Update last log in and ensure it's still admin if it's an admin email in case they were downgraded.
             await setDoc(userRef, {
                 lastLoginAt: serverTimestamp(),
+                ...(ADMIN_EMAILS.includes(userEmail) ? { role: 'admin' } : {})
             }, { merge: true });
         }
         alert("Login successful! Welcome to the Clinical Portal.");
