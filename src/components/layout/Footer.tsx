@@ -86,8 +86,8 @@ export const Footer = () => {
                     <Link to="/pharmacy" className="text-zinc-500 text-xs hover:text-white transition-colors">Pharmacy</Link>
                     <Link to="/stories" className="text-zinc-500 text-xs hover:text-white transition-colors">Stories</Link>
                     <Link to="/dr-lily" className="text-zinc-500 text-xs hover:text-white transition-colors">Instant Consultation</Link>
-                    <Link to="/privacy-policy" className="text-zinc-500 text-xs hover:text-white transition-colors">Privacy Policy</Link>
-                    <Link to="/terms-of-service" className="text-zinc-500 text-xs hover:text-white transition-colors">Terms of Service</Link>
+                    <a href="/privacy-policy" className="text-zinc-500 text-xs hover:text-white transition-colors">Privacy Policy</a>
+                    <a href="/terms-of-service" className="text-zinc-500 text-xs hover:text-white transition-colors">Terms of Service</a>
                     <Link to="/pet-safety-guide" className="text-zinc-500 text-xs hover:text-white transition-colors">Pet Safety Guide</Link>
                   </div>
                 </div>

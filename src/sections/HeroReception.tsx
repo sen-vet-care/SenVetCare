@@ -91,7 +91,7 @@ export const HeroReception = () => {
           </h1>
           
           <p className="font-inter text-lg lg:text-xl text-white/90 leading-relaxed max-w-xl mb-12 font-light drop-shadow-md">
-            Step into a haven designed for your pet's ultimate comfort and health. For over 30 years, Dr. TB Sen's legacy has been redefining veterinary excellence in Kolkata through empathy, precision, and state-of-the-art care.
+            Step into a haven designed for your pet's ultimate comfort and health. For over 30 years, Dr. TB Sen's legacy has been redefining veterinary excellence in Kolkata through empathy, precision, and state-of-the-art care. Our clinical web portal allows you to seamlessly book appointments, manage your pet's health records, and consult with our veterinary team.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-6 w-full sm:w-auto">

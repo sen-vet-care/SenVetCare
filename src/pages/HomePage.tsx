@@ -1,5 +1,6 @@
 import { Suspense, lazy, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
+import { Helmet } from 'react-helmet-async';
 import { HeroReception } from '../sections/HeroReception';
 const OurDoctors = lazy(() => import('../sections/OurDoctors').then(module => ({ default: module.OurDoctors })));
 const Services = lazy(() => import('../sections/Services').then(module => ({ default: module.Services })));
@@ -20,6 +21,9 @@ export const HomePage = () => {
 
   return (
     <main className="flex-grow relative overflow-hidden">
+      <Helmet>
+        <title>Sen Vet Care - Best Vet Clinic in Kolkata</title>
+      </Helmet>
       {/* Dynamic Parallax Background Elements */}
       <motion.div 
         style={{ y: bgY }}

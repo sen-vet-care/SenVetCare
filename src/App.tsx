@@ -4,7 +4,7 @@
  */
 
 import { Suspense, lazy, useEffect, useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { DrLilyWidget } from './components/ui/DrLilyWidget';
@@ -42,6 +42,7 @@ const SectionLoader = () => (
 
 export default function App() {
   const [webAccessEnabled, setWebAccessEnabled] = useState<boolean | null>(null);
+  const location = useLocation();
 
   useEffect(() => {
     const unsub = onSnapshot(doc(db, 'settings', 'config'), (docSnap) => {
@@ -58,7 +59,7 @@ export default function App() {
     return () => unsub();
   }, []);
 
-  if (webAccessEnabled === false) {
+  if (webAccessEnabled === false && !location.pathname.startsWith('/dashboard') && !location.pathname.startsWith('/portal-login')) {
      return (
        <div className="min-h-screen bg-clinical-bg flex items-center justify-center text-center p-6">
          <div>
