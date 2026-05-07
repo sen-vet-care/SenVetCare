@@ -30,6 +30,7 @@ const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage').then(
 const PetSafetyGuidePage = lazy(() => import('./pages/PetSafetyGuidePage').then(m => ({ default: m.PetSafetyGuidePage })));
 const CareersPage = lazy(() => import('./pages/CareersPage').then(m => ({ default: m.CareersPage })));
 const BookingPage = lazy(() => import('./pages/BookingPage').then(m => ({ default: m.BookingPage })));
+const DashboardPage = lazy(() => import('./pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
 
 const SectionLoader = () => (
   <div className="w-full py-20 flex items-center justify-center">
@@ -60,6 +61,7 @@ export default function App() {
             <Route path="/preventions" element={<PreventionsPage />} />
             <Route path="/dr-lily" element={<DrLilyPage />} />
             <Route path="/portal-login" element={<PortalLoginPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
             <Route path="/terms-of-service" element={<TermsOfServicePage />} />
             <Route path="/pet-safety-guide" element={<PetSafetyGuidePage />} />

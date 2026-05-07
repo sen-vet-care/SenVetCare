@@ -18,6 +18,18 @@ service cloud.firestore {
         && data.email.size() <= 200;
     }
 
+    function isValidPet(data) {
+      return data.keys().hasAll(['name', 'ownerId'])
+        && data.name is string
+        && data.ownerId is string;
+    }
+
+    function isValidMedicalRecord(data) {
+      return data.keys().hasAll(['petId', 'vetId', 'date'])
+        && data.petId is string
+        && data.vetId is string;
+    }
+
     match /users/{userId} {
       allow get: if isOwner(userId) || isAdmin();
       allow list: if isAdmin();
@@ -41,6 +53,24 @@ service cloud.firestore {
       allow get: if true;
       allow list: if true;
       allow create, update, delete: if isAdmin();
+    }
+
+    match /pets/{petId} {
+      allow get: if isOwner(existing().ownerId) || isAdmin() || exists(/databases/$(database)/documents/doctors/$(request.auth.uid));
+      allow list: if isOwner(resource.data.ownerId) || isAdmin() || exists(/databases/$(database)/documents/doctors/$(request.auth.uid));
+      allow create: if (isOwner(incoming().ownerId) || isAdmin())
+                    && isValidId(petId)
+                    && isValidPet(incoming());
+      allow update: if (isOwner(existing().ownerId) || isAdmin())
+                    && isValidPet(incoming())
+                    && incoming().ownerId == existing().ownerId;
+      allow delete: if isOwner(existing().ownerId) || isAdmin();
+    }
+
+    match /medical_records/{recordId} {
+      allow get: if isAdmin() || exists(/databases/$(database)/documents/doctors/$(request.auth.uid)) || (isSignedIn() && get(/databases/$(database)/documents/pets/$(existing().petId)).data.ownerId == request.auth.uid);
+      allow list: if isAdmin() || (isSignedIn() && resource.data.vetId == request.auth.uid) || (isSignedIn() && get(/databases/$(database)/documents/pets/$(resource.data.petId)).data.ownerId == request.auth.uid);
+      allow create, update, delete: if isAdmin() || exists(/databases/$(database)/documents/doctors/$(request.auth.uid));
     }
   }
 }

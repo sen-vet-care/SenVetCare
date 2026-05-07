@@ -1,11 +1,21 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
+import { auth } from '../../services/firebase';
+import { onAuthStateChanged, User } from 'firebase/auth';
 
 export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const location = useLocation();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
@@ -55,9 +65,15 @@ export const Navbar = () => {
           </div>
 
           <div className="flex items-center gap-1 md:gap-2 shrink-0">
-            <Link to="/portal-login" className="hidden lg:block bg-white text-black px-6 py-2.5 rounded-full font-inter text-xs font-bold tracking-widest uppercase hover:bg-primary hover:text-white shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all duration-500 hover:scale-105 active:scale-95 ml-2">
-              Sign In
-            </Link>
+            {user ? (
+              <Link to="/dashboard" className="hidden lg:block bg-white text-black px-6 py-2.5 rounded-full font-inter text-xs font-bold tracking-widest uppercase hover:bg-primary hover:text-white shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all duration-500 hover:scale-105 active:scale-95 ml-2 border border-white">
+                Dashboard
+              </Link>
+            ) : (
+              <Link to="/portal-login" className="hidden lg:block bg-[#14141A] border border-white/10 text-white px-6 py-2.5 rounded-full font-inter text-xs font-bold tracking-widest uppercase hover:bg-white hover:text-black shadow-[0_0_20px_rgba(255,255,255,0.05)] transition-all duration-500 hover:scale-105 active:scale-95 ml-2">
+                Sign In
+              </Link>
+            )}
             
             <button 
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
@@ -112,7 +128,11 @@ export const Navbar = () => {
                      Emergency
                    </Link>
                    <Link to="/stories" className="py-4 text-white border-b border-white/10 font-serif italic lowercase tracking-normal">Stories</Link>
-                   <Link to="/portal-login" className="py-4 text-white">Sign In</Link>
+                   {user ? (
+                     <Link to="/dashboard" className="py-4 text-white">Dashboard</Link>
+                   ) : (
+                     <Link to="/portal-login" className="py-4 text-white">Sign In</Link>
+                   )}
                 </div>
              </motion.div>
            )}

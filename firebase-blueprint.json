@@ -35,6 +35,34 @@
         "created_at": { "type": "string", "format": "date-time" }
       },
       "required": ["title", "content"]
+    },
+    "Pet": {
+      "title": "Pet",
+      "description": "Information about a pet",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "species": { "type": "string" },
+        "breed": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "age": { "type": "number" },
+        "weight": { "type": "number" }
+      },
+      "required": ["name", "ownerId"]
+    },
+    "MedicalRecord": {
+      "title": "Medical Record",
+      "description": "A veterinary medical record or appointment",
+      "type": "object",
+      "properties": {
+        "petId": { "type": "string" },
+        "vetId": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "diagnosis": { "type": "string" },
+        "treatment": { "type": "string" },
+        "status": { "type": "string" }
+      },
+      "required": ["petId", "vetId", "date"]
     }
   },
   "firestore": {
@@ -49,6 +77,14 @@
     "/blogs/{blogId}": {
       "schema": { "$ref": "#/entities/Blog" },
       "description": "Blog posts"
+    },
+    "/pets/{petId}": {
+      "schema": { "$ref": "#/entities/Pet" },
+      "description": "Pets"
+    },
+    "/medical_records/{recordId}": {
+      "schema": { "$ref": "#/entities/MedicalRecord" },
+      "description": "Medical records and appointments"
     }
   }
 }

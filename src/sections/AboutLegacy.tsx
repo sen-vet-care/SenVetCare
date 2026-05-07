@@ -21,12 +21,12 @@ export const AboutLegacy = () => {
         {/* Founder Frame */}
         <motion.div 
           style={{ y: founderY }}
-          className="flex flex-col justify-end min-h-[600px] md:h-auto md:min-h-0 md:col-span-8 md:row-span-2 relative rounded-3xl overflow-hidden shadow-lg group bg-black"
+          className="flex flex-col justify-end min-h-[700px] md:min-h-[750px] md:h-[750px] md:col-span-8 md:row-span-2 relative rounded-3xl overflow-hidden shadow-lg group bg-black"
         >
             <div className="absolute inset-0 bg-[rgba(112,66,20,0.15)] mix-blend-multiply z-10 pointer-events-none"></div>
-            <img loading="lazy" decoding="async" src="https://ik.imagekit.io/senvetcare/Logo/BCE81C07-6463-4405-93AB-57A012E2C15C%20-%20Shakya%20Sen.webp" alt="Founder portrait" className="absolute inset-0 w-full h-full object-cover object-[center_15%] transition-transform duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0" />
-            <div className="absolute inset-x-0 bottom-0 top-[20%] bg-gradient-to-t from-black via-black/80 to-transparent z-10"></div>
-            <div className="relative z-20 p-6 sm:p-8 pt-[280px] md:pt-[300px]">
+            <img loading="lazy" decoding="async" src="https://ik.imagekit.io/senvetcare/Logo/BCE81C07-6463-4405-93AB-57A012E2C15C%20-%20Shakya%20Sen.webp" alt="Founder portrait" className="absolute inset-0 w-full h-full object-cover object-[center_top] transition-transform duration-700 group-hover:scale-105 grayscale group-hover:grayscale-0" />
+            <div className="absolute inset-x-0 bottom-0 h-[50%] bg-gradient-to-t from-black via-black/90 to-transparent z-10 pointer-events-none"></div>
+            <div className="relative z-20 p-6 sm:p-8 mt-auto">
                 <span className="font-inter font-bold text-[12px] tracking-widest text-primary-fixed mb-2 block uppercase text-shadow-sm">The Founder</span>
                 <h3 className="font-manrope font-bold text-[28px] sm:text-[32px] mb-2 text-white drop-shadow-md leading-tight">Prof. Dr. Tamal Baran Sen</h3>
                 <p className="font-inter text-[14px] sm:text-[16px] max-w-xl text-white/90 font-medium drop-shadow-lg mb-4">A visionary in veterinary medicine, Dr. Sen laid the foundation of this clinic in 1990 with a singular mission: to provide world-class, empathetic care to every animal in need.</p>
