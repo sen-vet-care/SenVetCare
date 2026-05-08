@@ -5,6 +5,11 @@ import { doc, getDoc, collection, query, where, getDocs, updateDoc } from 'fireb
 import { motion } from 'motion/react';
 import { AdminServices } from '../components/dashboard/AdminServices';
 import { AdminDoctors } from '../components/dashboard/AdminDoctors';
+import { PetsPanel } from '../components/dashboard/PetsPanel';
+import { PatientsPanel } from '../components/dashboard/PatientsPanel';
+import { AppointmentsPanel } from '../components/dashboard/AppointmentsPanel';
+import { RecordsPanel } from '../components/dashboard/RecordsPanel';
+import { SeedDataButton } from '../components/dashboard/SeedDataButton';
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
@@ -18,7 +23,6 @@ export const DashboardPage = () => {
 
   // Settings placeholders
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [webAccessEnabled, setWebAccessEnabled] = useState(true);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -45,7 +49,6 @@ export const DashboardPage = () => {
             const settingsDoc = await getDoc(doc(db, 'settings', 'config'));
             if (settingsDoc.exists()) {
                setNotificationsEnabled(settingsDoc.data().notificationsEnabled ?? true);
-               setWebAccessEnabled(settingsDoc.data().webAccessEnabled ?? true);
             }
           }
         } else {
@@ -66,7 +69,6 @@ export const DashboardPage = () => {
   const handleToggleSetting = async (key: string, value: boolean) => {
      try {
         if (key === 'notificationsEnabled') setNotificationsEnabled(value);
-        if (key === 'webAccessEnabled') setWebAccessEnabled(value);
         await updateDoc(doc(db, 'settings', 'config'), { [key]: value });
      } catch(e) {
         console.error("Failed to update setting", e);
@@ -302,9 +304,18 @@ export const DashboardPage = () => {
           
           {activeTab === 'services' && userRole === 'admin' && <AdminServices />}
 
+          {activeTab === 'pets' && userRole === 'pet-owner' && <PetsPanel />}
+          
+          {activeTab === 'patients' && (userRole === 'admin' || userRole === 'vets') && <PatientsPanel />}
+          
+          {activeTab === 'appointments' && <AppointmentsPanel />}
+          
+          {activeTab === 'records' && <RecordsPanel />}
+
           {activeTab === 'settings' && userRole === 'admin' && (
              <div className="bg-surface rounded-[2rem] p-8 shadow-sm border border-outline-variant/30 animate-in fade-in slide-in-from-bottom-2 duration-500">
                <h3 className="font-manrope font-bold text-2xl text-ink-depth mb-6">App Settings</h3>
+               <SeedDataButton />
                
                <div className="space-y-6 max-w-2xl">
                  <div className="flex items-center justify-between p-6 bg-surface border border-outline-variant/50 rounded-2xl">
@@ -315,17 +326,6 @@ export const DashboardPage = () => {
                    <label className="relative inline-flex items-center cursor-pointer">
                      <input type="checkbox" className="sr-only peer" checked={notificationsEnabled} onChange={(e) => handleToggleSetting('notificationsEnabled', e.target.checked)} />
                      <div className="w-14 h-7 bg-zinc-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-primary"></div>
-                   </label>
-                 </div>
-
-                 <div className="flex items-center justify-between p-6 bg-red-50 border border-red-100 rounded-2xl">
-                   <div>
-                     <h4 className="font-manrope font-bold text-red-700 text-lg">App Web Access</h4>
-                     <p className="font-inter text-sm text-red-600/80 max-w-md">Toggle to completely stop or allow web access to the clinic app.</p>
-                   </div>
-                   <label className="relative inline-flex items-center cursor-pointer">
-                     <input type="checkbox" className="sr-only peer" checked={webAccessEnabled} onChange={(e) => handleToggleSetting('webAccessEnabled', e.target.checked)} />
-                     <div className="w-14 h-7 bg-red-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-red-500"></div>
                    </label>
                  </div>
                </div>

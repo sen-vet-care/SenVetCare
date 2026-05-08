@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../services/firebase';
 
 export const BookingPage = () => {
   const location = useLocation();
@@ -9,6 +11,7 @@ export const BookingPage = () => {
   const isEmergency = searchParams.get('emergency') === 'true';
 
   const [status, setStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+  const [doctors, setDoctors] = useState<any[]>([]);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -16,6 +19,7 @@ export const BookingPage = () => {
     petDetails: '',
     date: '',
     time: '',
+    doctorId: '',
   });
 
   const [minDate, setMinDate] = useState('');
@@ -27,6 +31,18 @@ export const BookingPage = () => {
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
     setMinDate(`${yyyy}-${mm}-${dd}`);
+    
+    // Fetch doctors
+    const fetchDoctors = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'doctors'));
+        const docs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setDoctors(docs);
+      } catch (err) {
+        console.warn("Failed to fetch doctors:", err);
+      }
+    };
+    fetchDoctors();
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -148,6 +164,25 @@ export const BookingPage = () => {
               />
             </div>
 
+            <div className={`space-y-2 ${isEmergency ? 'hidden' : ''}`}>
+              <label className="text-[10px] uppercase tracking-widest font-black text-on-surface-variant">Preferred Doctor (Optional)</label>
+              <div className="relative">
+                <select 
+                  value={formData.doctorId}
+                  onChange={(e) => setFormData({...formData, doctorId: e.target.value})}
+                  className="w-full bg-surface-container border border-outline-variant rounded-xl py-3 px-4 pr-10 text-sm text-white focus:outline-none focus:border-primary transition-colors focus:ring-1 focus:ring-primary shadow-inner appearance-none"
+                >
+                  <option value="">Any Available Doctor</option>
+                  {doctors.filter(d => d.isPresent).map(doc => (
+                    <option key={doc.id} value={doc.id}>{doc.name} - {doc.specialty}</option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-zinc-500">
+                   <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                </div>
+              </div>
+            </div>
+
             <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${isEmergency ? 'hidden' : ''}`}>
               <div className="space-y-2">
                 <label className="text-[10px] uppercase tracking-widest font-black text-on-surface-variant">Date { !isEmergency && <span className="text-error">*</span>}</label>
@@ -162,17 +197,22 @@ export const BookingPage = () => {
               </div>
               <div className="space-y-2">
                 <label className="text-[10px] uppercase tracking-widest font-black text-on-surface-variant">Preferred Time { !isEmergency && <span className="text-error">*</span>}</label>
-                <select 
-                  required={!isEmergency}
-                  value={formData.time}
-                  onChange={(e) => setFormData({...formData, time: e.target.value})}
-                  className="w-full bg-surface-container border border-outline-variant rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:border-primary transition-colors focus:ring-1 focus:ring-primary shadow-inner appearance-none"
-                >
-                  <option value="" disabled>Select Time Slot</option>
-                  <option value="morning">Morning (10:00 AM - 1:00 PM)</option>
-                  <option value="afternoon">Afternoon (2:00 PM - 5:00 PM)</option>
-                  <option value="evening">Evening (6:00 PM - 8:00 PM)</option>
-                </select>
+                <div className="relative">
+                  <select 
+                    required={!isEmergency}
+                    value={formData.time}
+                    onChange={(e) => setFormData({...formData, time: e.target.value})}
+                    className="w-full bg-surface-container border border-outline-variant rounded-xl py-3 px-4 pr-10 text-sm text-white focus:outline-none focus:border-primary transition-colors focus:ring-1 focus:ring-primary shadow-inner appearance-none"
+                  >
+                    <option value="" disabled>Select Time Slot</option>
+                    <option value="morning">Morning (10:00 AM - 1:00 PM)</option>
+                    <option value="afternoon">Afternoon (2:00 PM - 5:00 PM)</option>
+                    <option value="evening">Evening (6:00 PM - 8:00 PM)</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-zinc-500">
+                     <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                  </div>
+                </div>
               </div>
             </div>
 

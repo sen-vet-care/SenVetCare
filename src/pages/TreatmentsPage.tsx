@@ -1,8 +1,59 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../services/firebase';
+
+interface ServiceItem {
+  id: string;
+  name: string;
+  description: string;
+  rate: string | number;
+  unit: string;
+  category: string;
+  group?: string;
+}
 
 export const TreatmentsPage = () => {
+  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const q = query(collection(db, 'services'), where('category', '==', 'Treatments'));
+        const snap = await getDocs(q);
+        const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ServiceItem));
+        setServices(data);
+      } catch (err) {
+        console.warn('Error fetching treatments:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServices();
+  }, []);
+
+  // Group services by 'group' field
+  const groupedServices = services.reduce((acc, curr) => {
+    const groupName = curr.group || 'Other Treatments';
+    if (!acc[groupName]) acc[groupName] = [];
+    acc[groupName].push(curr);
+    return acc;
+  }, {} as Record<string, ServiceItem[]>);
+
+  const getIconForGroup = (group: string) => {
+    const lower = group.toLowerCase();
+    if (lower.includes('consult')) return { icon: 'stethoscope', color: 'text-secondary', bg: 'bg-secondary/10' };
+    if (lower.includes('prevent') || lower.includes('well')) return { icon: 'health_metrics', color: 'text-emerald-500', bg: 'bg-emerald-500/10' };
+    if (lower.includes('emerg') || lower.includes('critic')) return { icon: 'emergency', color: 'text-error', bg: 'bg-error/10' };
+    if (lower.includes('surg')) return { icon: 'content_cut', color: 'text-blue-500', bg: 'bg-blue-500/10' };
+    if (lower.includes('ortho')) return { icon: 'bone', color: 'text-waiting-gold', bg: 'bg-waiting-gold/10' };
+    if (lower.includes('dent')) return { icon: 'dentistry', color: 'text-purple-500', bg: 'bg-purple-500/10' };
+    return { icon: 'medical_services', color: 'text-teal-500', bg: 'bg-teal-500/10' };
+  };
+
   return (
     <>
       <Helmet>
@@ -31,91 +82,34 @@ export const TreatmentsPage = () => {
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
-          
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-surface p-8 rounded-[2rem] border border-outline-variant/30 flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
-             <div className="w-14 h-14 bg-secondary/10 text-secondary rounded-2xl flex items-center justify-center mb-6">
-               <span className="material-symbols-outlined text-3xl">stethoscope</span>
+          {!loading && Object.entries(groupedServices).map(([groupName, items], idx) => {
+             const style = getIconForGroup(groupName);
+             return (
+              <motion.div key={groupName} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + (idx * 0.1) }} className="bg-surface p-8 rounded-[2rem] border border-outline-variant/30 flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
+                <div className={`w-14 h-14 ${style.bg} ${style.color} rounded-2xl flex items-center justify-center mb-6`}>
+                  <span className="material-symbols-outlined text-3xl">{style.icon}</span>
+                </div>
+                <h3 className="font-manrope font-bold text-2xl text-white mb-4">{groupName}</h3>
+                <ul className="space-y-3 font-inter text-on-surface-variant flex-grow">
+                  {items.map((item, idxx) => (
+                    <li key={item.id} className={`flex justify-between ${idxx !== items.length - 1 ? 'border-b border-white/5 pb-2' : 'pb-2'}`}>
+                      <div className="flex flex-col">
+                         <span>{item.name}</span>
+                         {item.description && <span className="text-[10px] text-on-surface-variant mt-0.5">{item.description}</span>}
+                      </div>
+                      <span className="font-bold text-white text-right shrink-0 ml-4">₹{item.rate} <span className="text-[10px] font-normal text-on-surface-variant block md:inline">{item.unit}</span></span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+             )
+          })}
+          {!loading && Object.keys(groupedServices).length === 0 && (
+             <div className="col-span-1 md:col-span-2 text-center py-12 bg-surface rounded-[2rem] border border-outline-variant/30">
+                <span className="material-symbols-outlined text-4xl text-on-surface-variant mb-4 opacity-50">medical_services</span>
+                <p className="text-on-surface-variant">Treatment services are currently being updated by the administration.</p>
              </div>
-             <h3 className="font-manrope font-bold text-2xl text-white mb-4">Consultations</h3>
-             <ul className="space-y-3 font-inter text-on-surface-variant flex-grow">
-               <li className="flex justify-between border-b border-white/5 pb-2"><span>General OPD</span> <span className="font-bold text-white text-right">₹300 – ₹800</span></li>
-               <li className="flex justify-between border-b border-white/5 pb-2"><span>Specialist</span> <span className="font-bold text-white text-right">₹800 – ₹1500</span></li>
-               <li className="flex justify-between pb-2"><span>Follow-up Visits</span> <span className="font-bold text-white text-right">₹200 – ₹500</span></li>
-             </ul>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-surface p-8 rounded-[2rem] border border-outline-variant/30 flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
-             <div className="w-14 h-14 bg-emerald-500/10 text-emerald-500 rounded-2xl flex items-center justify-center mb-6">
-               <span className="material-symbols-outlined text-3xl">health_metrics</span>
-             </div>
-             <h3 className="font-manrope font-bold text-2xl text-white mb-4">Preventive & Wellness</h3>
-             <ul className="space-y-3 font-inter text-on-surface-variant flex-grow">
-               <li className="flex justify-between border-b border-white/5 pb-2"><span>Routine Health Check-ups</span> <span className="font-bold text-white text-right">₹500 – ₹1500</span></li>
-               <li className="flex justify-between pb-2"><span>Senior Pet Screening</span> <span className="font-bold text-white text-right">₹1500 – ₹4000</span></li>
-             </ul>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-surface p-8 rounded-[2rem] border border-error/30 flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-500 relative overflow-hidden">
-             <div className="absolute top-0 left-0 w-full h-1 bg-error"></div>
-             <div className="w-14 h-14 bg-error/10 text-error rounded-2xl flex items-center justify-center mb-6">
-               <span className="material-symbols-outlined text-3xl">emergency</span>
-             </div>
-             <h3 className="font-manrope font-bold text-2xl text-white mb-4">Emergency & Critical</h3>
-             <ul className="space-y-3 font-inter text-on-surface-variant flex-grow">
-               <li className="flex justify-between border-b border-white/5 pb-2"><span>Emergency Consultation</span> <span className="font-bold text-white text-right">₹1000 – ₹3000</span></li>
-               <li className="flex justify-between pb-2"><span>ICU / Monitoring (per day)</span> <span className="font-bold text-white text-right">₹2000 – ₹8000</span></li>
-             </ul>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="bg-surface p-8 rounded-[2rem] border border-outline-variant/30 flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
-             <div className="w-14 h-14 bg-blue-500/10 text-blue-500 rounded-2xl flex items-center justify-center mb-6">
-               <span className="material-symbols-outlined text-3xl">content_cut</span>
-             </div>
-             <h3 className="font-manrope font-bold text-2xl text-white mb-4">Surgical Procedures</h3>
-             <ul className="space-y-3 font-inter text-on-surface-variant flex-grow">
-               <li className="flex justify-between border-b border-white/5 pb-2"><span>Spay/Neuter</span> <span className="font-bold text-white text-right">₹4000 – ₹15000</span></li>
-               <li className="flex justify-between border-b border-white/5 pb-2"><span>Tumor Removal</span> <span className="font-bold text-white text-right">₹5000 – ₹25000+</span></li>
-               <li className="flex justify-between pb-2"><span>Wound Management</span> <span className="font-bold text-white text-right">₹1500 – ₹8000</span></li>
-             </ul>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="bg-surface p-8 rounded-[2rem] border border-outline-variant/30 flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
-             <div className="w-14 h-14 bg-waiting-gold/10 text-waiting-gold rounded-2xl flex items-center justify-center mb-6">
-               <span className="material-symbols-outlined text-3xl">bone</span>
-             </div>
-             <h3 className="font-manrope font-bold text-2xl text-white mb-4">Orthopedic Care</h3>
-             <ul className="space-y-3 font-inter text-on-surface-variant flex-grow">
-               <li className="flex justify-between border-b border-white/5 pb-2"><span>Fracture Repair</span> <span className="font-bold text-white text-right">₹10000 – ₹50000+</span></li>
-               <li className="flex justify-between pb-2"><span>Ligament Surgeries</span> <span className="font-bold text-white text-right">₹15000 – ₹60000+</span></li>
-             </ul>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="bg-surface p-8 rounded-[2rem] border border-outline-variant/30 flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
-             <div className="w-14 h-14 bg-purple-500/10 text-purple-500 rounded-2xl flex items-center justify-center mb-6">
-               <span className="material-symbols-outlined text-3xl">dentistry</span>
-             </div>
-             <h3 className="font-manrope font-bold text-2xl text-white mb-4">Dental Care</h3>
-             <ul className="space-y-3 font-inter text-on-surface-variant flex-grow">
-               <li className="flex justify-between border-b border-white/5 pb-2"><span>Scaling & Polishing</span> <span className="font-bold text-white text-right">₹2000 – ₹6000</span></li>
-               <li className="flex justify-between pb-2"><span>Tooth Extraction (per tooth)</span> <span className="font-bold text-white text-right">₹500 – ₹3000</span></li>
-             </ul>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="bg-surface p-8 rounded-[2rem] border border-outline-variant/30 flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-500 md:col-span-2">
-             <div className="w-14 h-14 bg-teal-500/10 text-teal-500 rounded-2xl flex items-center justify-center mb-6">
-               <span className="material-symbols-outlined text-3xl">medical_services</span>
-             </div>
-             <h3 className="font-manrope font-bold text-2xl text-white mb-4">Specialized Treatments & Chronic Disease Management</h3>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-3 font-inter text-on-surface-variant">
-               <div className="flex justify-between border-b border-white/5 pb-2"><span>Dermatology (Skin Care)</span> <span className="font-bold text-white text-right">₹500 – ₹3000</span></div>
-               <div className="flex justify-between border-b border-white/5 pb-2"><span>Ophthalmology (Eye Care)</span> <span className="font-bold text-white text-right">₹800 – ₹3000</span></div>
-               <div className="flex justify-between border-b border-white/5 pb-2"><span>Cardiology Consultation</span> <span className="font-bold text-white text-right">₹1500 – ₹4000</span></div>
-               <div className="flex justify-between border-b border-white/5 pb-2"><span>Oncology (Cancer Care)</span> <span className="font-bold text-white text-right">₹5000 – ₹50000+</span></div>
-               <div className="flex justify-between border-b border-white/5 pb-2"><span>Physiotherapy (per session)</span> <span className="font-bold text-white text-right">₹500 – ₹2500</span></div>
-               <div className="flex justify-between border-b border-white/5 pb-2"><span>Kidney, Liver, Diabetes Care</span> <span className="font-bold text-white text-right">₹1000 – ₹5000</span></div>
-             </div>
-          </motion.div>
-
+          )}
         </div>
 
         <div className="mt-16 text-center text-sm text-on-surface-variant italic relative z-10 max-w-2xl mx-auto bg-surface py-6 px-8 rounded-full border border-outline-variant/30">
@@ -123,7 +117,7 @@ export const TreatmentsPage = () => {
         </div>
         
         <div className="mt-12 flex justify-center">
-          <Link to="/dr-lily" className="px-8 py-4 bg-white text-black rounded-full font-inter font-bold text-sm tracking-widest uppercase hover:bg-waiting-gold hover:text-black transition-all duration-500 shadow-[0_0_30px_rgba(255,255,255,0.15)] flex items-center justify-center gap-3">
+          <Link to="/book" className="px-8 py-4 bg-white text-black rounded-full font-inter font-bold text-sm tracking-widest uppercase hover:bg-waiting-gold hover:text-black transition-all duration-500 shadow-[0_0_30px_rgba(255,255,255,0.15)] flex items-center justify-center gap-3">
              Book Clinic Appointment
              <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
           </Link>

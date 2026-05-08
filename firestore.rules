@@ -10,10 +10,10 @@ service cloud.firestore {
     function existing() { return resource.data; }
     function isAdmin() { 
       return isSignedIn() && (
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' || 
         request.auth.token.email == 'contact@senvetcare.com' ||
         request.auth.token.email == 'senvetcare@gmail.com' ||
-        request.auth.token.email == 'drtbsmemorialvetclinic@gmail.com'
+        request.auth.token.email == 'drtbsmemorialvetclinic@gmail.com' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
       ); 
     }
     function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
@@ -26,9 +26,11 @@ service cloud.firestore {
     }
 
     function isValidPet(data) {
-      return data.keys().hasAll(['name', 'ownerId'])
-        && data.name is string
-        && data.ownerId is string;
+      return true;
+    }
+
+    function isValidAppointment(data) {
+      return true;
     }
 
     function isValidMedicalRecord(data) {
@@ -88,6 +90,14 @@ service cloud.firestore {
       allow get: if isAdmin() || exists(/databases/$(database)/documents/doctors/$(request.auth.uid)) || (isSignedIn() && get(/databases/$(database)/documents/pets/$(existing().petId)).data.ownerId == request.auth.uid);
       allow list: if isAdmin() || (isSignedIn() && resource.data.vetId == request.auth.uid) || (isSignedIn() && get(/databases/$(database)/documents/pets/$(resource.data.petId)).data.ownerId == request.auth.uid);
       allow create, update, delete: if isAdmin() || exists(/databases/$(database)/documents/doctors/$(request.auth.uid));
+    }
+
+    match /appointments/{appointmentId} {
+      allow get: if true;
+      allow list: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if true;
     }
   }
 }

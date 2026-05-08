@@ -1,8 +1,56 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../services/firebase';
+
+interface ServiceItem {
+  id: string;
+  name: string;
+  description: string;
+  rate: string | number;
+  unit: string;
+  category: string;
+  group?: string;
+}
 
 export const PreventionPage = () => {
+  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const q = query(collection(db, 'services'), where('category', '==', 'Preventions'));
+        const snap = await getDocs(q);
+        const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ServiceItem));
+        setServices(data);
+      } catch (err) {
+        console.warn('Error fetching preventions:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServices();
+  }, []);
+
+  const groupedServices = services.reduce((acc, curr) => {
+    const groupName = curr.group || 'Other Preventions';
+    if (!acc[groupName]) acc[groupName] = [];
+    acc[groupName].push(curr);
+    return acc;
+  }, {} as Record<string, ServiceItem[]>);
+
+  const getIconForGroup = (group: string) => {
+    const lower = group.toLowerCase();
+    if (lower.includes('dog') || lower.includes('canine')) return { icon: 'vaccines', color: 'text-secondary', bg: 'bg-secondary/10' };
+    if (lower.includes('cat') || lower.includes('feline')) return { icon: 'pets', color: 'text-primary', bg: 'bg-primary/10' };
+    if (lower.includes('deworm') || lower.includes('parasit')) return { icon: 'medication', color: 'text-emerald-500', bg: 'bg-emerald-500/10' };
+    if (lower.includes('plan') || lower.includes('annual')) return { icon: 'verified_user', color: 'text-waiting-gold', bg: 'bg-waiting-gold/10' };
+    return { icon: 'health_and_safety', color: 'text-blue-500', bg: 'bg-blue-500/10' };
+  };
+
   return (
     <>
       <Helmet>
@@ -31,53 +79,34 @@ export const PreventionPage = () => {
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
-          
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-surface p-8 rounded-[2rem] border border-outline-variant/30 flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
-             <div className="w-14 h-14 bg-secondary/10 text-secondary rounded-2xl flex items-center justify-center mb-6">
-               <span className="material-symbols-outlined text-3xl">vaccines</span>
+          {!loading && Object.entries(groupedServices).map(([groupName, items], idx) => {
+             const style = getIconForGroup(groupName);
+             return (
+              <motion.div key={groupName} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + (idx * 0.1) }} className="bg-surface p-8 rounded-[2rem] border border-outline-variant/30 flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
+                <div className={`w-14 h-14 ${style.bg} ${style.color} rounded-2xl flex items-center justify-center mb-6`}>
+                  <span className="material-symbols-outlined text-3xl">{style.icon}</span>
+                </div>
+                <h3 className="font-manrope font-bold text-2xl text-white mb-4">{groupName}</h3>
+                <ul className="space-y-3 font-inter text-on-surface-variant flex-grow">
+                  {items.map((item, idxx) => (
+                    <li key={item.id} className={`flex justify-between ${idxx !== items.length - 1 ? 'border-b border-white/5 pb-2' : 'pb-2'}`}>
+                      <div className="flex flex-col">
+                         <span>{item.name}</span>
+                         {item.description && <span className="text-[10px] text-on-surface-variant mt-0.5">{item.description}</span>}
+                      </div>
+                      <span className="font-bold text-white text-right">₹{item.rate} <span className="text-[10px] font-normal text-on-surface-variant">{item.unit}</span></span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+             )
+          })}
+          {!loading && Object.keys(groupedServices).length === 0 && (
+             <div className="col-span-1 md:col-span-2 text-center py-12 bg-surface rounded-[2rem] border border-outline-variant/30">
+                <span className="material-symbols-outlined text-4xl text-on-surface-variant mb-4 opacity-50">health_and_safety</span>
+                <p className="text-on-surface-variant">Preventive services are currently being updated by the administration.</p>
              </div>
-             <h3 className="font-manrope font-bold text-2xl text-white mb-4">Dog Vaccination</h3>
-             <ul className="space-y-3 font-inter text-on-surface-variant flex-grow">
-               <li className="flex justify-between border-b border-white/5 pb-2"><span>DHPPi (7-in-1 / 9-in-1)</span> <span className="font-bold text-white text-right">₹700 – ₹1500</span></li>
-               <li className="flex justify-between border-b border-white/5 pb-2"><span>Anti-Rabies</span> <span className="font-bold text-white text-right">₹300 – ₹800</span></li>
-               <li className="flex justify-between pb-2"><span>Annual Booster Packages</span> <span className="font-bold text-white text-right">₹1500 – ₹3000</span></li>
-             </ul>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-surface p-8 rounded-[2rem] border border-outline-variant/30 flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
-             <div className="w-14 h-14 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mb-6">
-               <span className="material-symbols-outlined text-3xl">pets</span>
-             </div>
-             <h3 className="font-manrope font-bold text-2xl text-white mb-4">Cat Vaccination</h3>
-             <ul className="space-y-3 font-inter text-on-surface-variant flex-grow">
-               <li className="flex justify-between border-b border-white/5 pb-2"><span>FVRCP</span> <span className="font-bold text-white text-right">₹700 – ₹1500</span></li>
-               <li className="flex justify-between border-b border-white/5 pb-2"><span>Anti-Rabies</span> <span className="font-bold text-white text-right">₹300 – ₹800</span></li>
-             </ul>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="bg-surface p-8 rounded-[2rem] border border-outline-variant/30 flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
-             <div className="w-14 h-14 bg-emerald-500/10 text-emerald-500 rounded-2xl flex items-center justify-center mb-6">
-               <span className="material-symbols-outlined text-3xl">medication</span>
-             </div>
-             <h3 className="font-manrope font-bold text-2xl text-white mb-4">Deworming & Parasites</h3>
-             <ul className="space-y-3 font-inter text-on-surface-variant flex-grow">
-               <li className="flex justify-between border-b border-white/5 pb-2"><span>Deworming (per dose)</span> <span className="font-bold text-white text-right">₹100 – ₹500</span></li>
-               <li className="flex justify-between pb-2"><span>Tick & Flea Prevention</span> <span className="font-bold text-white text-right text-xs">₹300 – ₹1500<br/><span className="text-[10px] font-normal text-on-surface-variant">(depending on product & size)</span></span></li>
-             </ul>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="bg-surface p-8 rounded-[2rem] border border-outline-variant/30 flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
-             <div className="w-14 h-14 bg-waiting-gold/10 text-waiting-gold rounded-2xl flex items-center justify-center mb-6">
-               <span className="material-symbols-outlined text-3xl">verified_user</span>
-             </div>
-             <h3 className="font-manrope font-bold text-2xl text-white mb-4">Annual Preventive Plans</h3>
-             <p className="font-inter text-on-surface-variant mb-4 flex-grow">Comprehensive annual plans including vaccinations, deworming & basic health checkups for peace of mind.</p>
-             <div className="flex justify-between items-center border-t border-white/5 pt-4">
-                 <span className="font-inter text-on-surface-variant">Annual Plans Start From</span>
-                 <span className="font-bold text-white text-xl">₹2000 – ₹6000</span>
-             </div>
-          </motion.div>
-
+          )}
         </div>
 
         <div className="mt-16 text-center text-sm text-on-surface-variant italic relative z-10 max-w-2xl mx-auto bg-surface py-6 px-8 rounded-full border border-outline-variant/30">
@@ -85,7 +114,7 @@ export const PreventionPage = () => {
         </div>
         
         <div className="mt-12 flex justify-center">
-          <Link to="/dr-lily" className="px-8 py-4 bg-white text-black rounded-full font-inter font-bold text-sm tracking-widest uppercase hover:bg-waiting-gold hover:text-black transition-all duration-500 shadow-[0_0_30px_rgba(255,255,255,0.15)] flex items-center justify-center gap-3">
+          <Link to="/book" className="px-8 py-4 bg-white text-black rounded-full font-inter font-bold text-sm tracking-widest uppercase hover:bg-waiting-gold hover:text-black transition-all duration-500 shadow-[0_0_30px_rgba(255,255,255,0.15)] flex items-center justify-center gap-3">
              Book Clinic Appointment
              <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
           </Link>

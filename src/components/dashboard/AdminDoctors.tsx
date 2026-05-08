@@ -6,6 +6,7 @@ interface Doctor {
   id: string;
   name: string;
   specialty: string;
+  days?: string;
   timings: string;
   isPresent: boolean;
 }
@@ -15,7 +16,7 @@ export const AdminDoctors = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState({ name: '', specialty: '', timings: '', isPresent: true });
+  const [formData, setFormData] = useState({ name: '', specialty: '', days: '', timings: '', isPresent: true });
 
   useEffect(() => {
     const q = query(collection(db, 'doctors'));
@@ -33,7 +34,7 @@ export const AdminDoctors = () => {
       } else {
         await addDoc(collection(db, 'doctors'), formData);
       }
-      setFormData({ name: '', specialty: '', timings: '', isPresent: true });
+      setFormData({ name: '', specialty: '', days: '', timings: '', isPresent: true });
       setIsAdding(false);
       setEditingId(null);
     } catch (e) {
@@ -55,16 +56,17 @@ export const AdminDoctors = () => {
     <div className="bg-surface rounded-[2rem] p-8 shadow-sm border border-outline-variant/30 animate-in fade-in">
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-manrope font-bold text-2xl text-ink-depth">Manage Doctors</h3>
-        <button onClick={() => { setIsAdding(true); setEditingId(null); setFormData({ name: '', specialty: '', timings: '', isPresent: true }); }} className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow hover:bg-blue-700 transition">
+        <button onClick={() => { setIsAdding(true); setEditingId(null); setFormData({ name: '', specialty: '', days: '', timings: '', isPresent: true }); }} className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow hover:bg-blue-700 transition">
           + Add Doctor
         </button>
       </div>
 
       {(isAdding || editingId) && (
         <div className="mb-8 p-6 bg-surface-container-low border border-outline-variant/30 rounded-2xl grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input className="px-4 py-3 bg-white border border-outline-variant rounded-xl" placeholder="Full Name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
-          <input className="px-4 py-3 bg-white border border-outline-variant rounded-xl" placeholder="Specialty" value={formData.specialty} onChange={e => setFormData({...formData, specialty: e.target.value})} />
-          <input className="px-4 py-3 bg-white border border-outline-variant rounded-xl md:col-span-2" placeholder="Timings (e.g. Mon-Fri 9AM - 5PM)" value={formData.timings} onChange={e => setFormData({...formData, timings: e.target.value})} />
+          <input className="px-4 py-3 bg-white border border-outline-variant rounded-xl text-zinc-900 placeholder:text-zinc-500" placeholder="Full Name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+          <input className="px-4 py-3 bg-white border border-outline-variant rounded-xl text-zinc-900 placeholder:text-zinc-500" placeholder="Specialty" value={formData.specialty} onChange={e => setFormData({...formData, specialty: e.target.value})} />
+          <input className="px-4 py-3 bg-white border border-outline-variant rounded-xl text-zinc-900 placeholder:text-zinc-500" placeholder="Days (e.g. Mon-Fri)" value={formData.days || ''} onChange={e => setFormData({...formData, days: e.target.value})} />
+          <input className="px-4 py-3 bg-white border border-outline-variant rounded-xl text-zinc-900 placeholder:text-zinc-500" placeholder="Timings (e.g. 9AM - 5PM)" value={formData.timings} onChange={e => setFormData({...formData, timings: e.target.value})} />
           
           <div className="md:col-span-2 flex items-center gap-3">
              <label className="font-bold text-sm text-ink-depth">Currently Present?</label>
@@ -73,7 +75,7 @@ export const AdminDoctors = () => {
 
           <div className="md:col-span-2 flex gap-3 mt-4">
             <button onClick={handleSave} className="bg-ink-depth text-white px-6 py-2.5 rounded-xl font-bold hover:bg-black transition text-sm">Save</button>
-            <button onClick={() => { setIsAdding(false); setEditingId(null); }} className="px-6 py-2.5 rounded-xl font-bold bg-white border border-outline-variant hover:bg-zinc-50 transition text-sm">Cancel</button>
+            <button onClick={() => { setIsAdding(false); setEditingId(null); }} className="px-6 py-2.5 rounded-xl font-bold bg-white text-zinc-900 border border-outline-variant hover:bg-zinc-50 transition text-sm">Cancel</button>
           </div>
         </div>
       )}
@@ -89,6 +91,7 @@ export const AdminDoctors = () => {
                  </span>
               </div>
               <p className="text-sm text-zinc-600 font-medium">{d.specialty}</p>
+              {d.days && <p className="text-sm text-zinc-600 font-semibold mt-1">{d.days}</p>}
               <p className="text-sm text-on-surface-variant mt-1 flex items-center gap-1"><span className="material-symbols-outlined text-xs">schedule</span> {d.timings || 'Not specified'}</p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
@@ -99,7 +102,7 @@ export const AdminDoctors = () => {
                  Mark {d.isPresent ? 'Absent' : 'Present'}
               </button>
               <div className="flex items-center gap-2 border-l border-zinc-200 pl-3 ml-1">
-                <button onClick={() => { setEditingId(d.id); setFormData({ name: d.name, specialty: d.specialty, timings: d.timings, isPresent: d.isPresent }); }} className="p-2 text-zinc-500 hover:text-blue-600 bg-surface-container rounded-lg transition"><span className="material-symbols-outlined text-sm">edit</span></button>
+                <button onClick={() => { setEditingId(d.id); setFormData({ name: d.name, specialty: d.specialty, days: d.days || '', timings: d.timings, isPresent: d.isPresent }); }} className="p-2 text-zinc-500 hover:text-blue-600 bg-surface-container rounded-lg transition"><span className="material-symbols-outlined text-sm">edit</span></button>
                 <button onClick={() => handleDelete(d.id)} className="p-2 text-zinc-500 hover:text-red-600 bg-surface-container rounded-lg transition"><span className="material-symbols-outlined text-sm">delete</span></button>
               </div>
             </div>

@@ -1,9 +1,56 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../services/firebase';
+
+interface ServiceItem {
+  id: string;
+  name: string;
+  description: string;
+  rate: string | number;
+  unit: string;
+  category: string;
+  group?: string;
+}
 
 export const PharmacyPage = () => {
+  const [services, setServices] = useState<ServiceItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const q = query(collection(db, 'services'), where('category', '==', 'Pharmacy'));
+        const snap = await getDocs(q);
+        const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as ServiceItem));
+        setServices(data);
+      } catch (err) {
+        console.warn('Error fetching pharmacy items:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServices();
+  }, []);
+
+  const groupedServices = services.reduce((acc, curr) => {
+    const groupName = curr.group || 'Pharmacy Items';
+    if (!acc[groupName]) acc[groupName] = [];
+    acc[groupName].push(curr);
+    return acc;
+  }, {} as Record<string, ServiceItem[]>);
+
+  const getIconForGroup = (group: string) => {
+    const lower = group.toLowerCase();
+    if (lower.includes('med') || lower.includes('presc')) return { icon: 'prescriptions', color: 'text-pharmacy-green', bg: 'bg-pharmacy-green/10' };
+    if (lower.includes('vacc')) return { icon: 'vaccines', color: 'text-blue-500', bg: 'bg-blue-500/10' };
+    if (lower.includes('supp')) return { icon: 'health_metrics', color: 'text-amber-500', bg: 'bg-amber-500/10' };
+    if (lower.includes('diet') || lower.includes('food')) return { icon: 'restaurant', color: 'text-orange-500', bg: 'bg-orange-500/10' };
+    return { icon: 'medication', color: 'text-emerald-500', bg: 'bg-emerald-500/10' };
+  };
+
   return (
     <>
       <Helmet>
@@ -60,6 +107,31 @@ export const PharmacyPage = () => {
                 </motion.div>
               ))}
             </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10 mb-24">
+          {!loading && Object.entries(groupedServices).map(([groupName, items], idx) => {
+             const style = getIconForGroup(groupName);
+             return (
+              <motion.div key={groupName} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + (idx * 0.1) }} className="bg-surface p-8 rounded-[2rem] border border-outline-variant/30 flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
+                <div className={`w-14 h-14 ${style.bg} ${style.color} rounded-2xl flex items-center justify-center mb-6`}>
+                  <span className="material-symbols-outlined text-3xl">{style.icon}</span>
+                </div>
+                <h3 className="font-manrope font-bold text-2xl text-white mb-4">{groupName}</h3>
+                <ul className="space-y-3 font-inter text-on-surface-variant flex-grow">
+                  {items.map((item, idxx) => (
+                    <li key={item.id} className={`flex justify-between ${idxx !== items.length - 1 ? 'border-b border-white/5 pb-2' : 'pb-2'}`}>
+                      <div className="flex flex-col">
+                         <span>{item.name}</span>
+                         {item.description && <span className="text-[10px] text-on-surface-variant mt-0.5">{item.description}</span>}
+                      </div>
+                      <span className="font-bold text-white text-right">₹{item.rate} <span className="text-[10px] font-normal text-on-surface-variant">{item.unit}</span></span>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+             )
+          })}
           </div>
 
           {/* Why Buy From Us */}
@@ -119,7 +191,7 @@ export const PharmacyPage = () => {
               Current patients can quickly schedule a pickup for their ongoing treatments through our automated booking system.
             </p>
             <div className="relative z-10 flex justify-center">
-              <Link to="/dr-lily" className="px-8 py-4 bg-pharmacy-green text-black rounded-full font-inter font-bold text-sm tracking-widest uppercase hover:bg-white hover:text-black transition-all duration-500 shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_40px_rgba(0,200,150,0.3)] flex items-center gap-3">
+              <Link to="/book" className="px-8 py-4 bg-pharmacy-green text-black rounded-full font-inter font-bold text-sm tracking-widest uppercase hover:bg-white hover:text-black transition-all duration-500 shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_40px_rgba(0,200,150,0.3)] flex items-center gap-3">
                  Restock Medicines
                  <span className="material-symbols-outlined text-[18px]">shopping_cart</span>
               </Link>
