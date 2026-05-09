@@ -78,6 +78,8 @@ const STANDARD_SERVICES = [
 
 export const AdminServices = () => {
   const [services, setServices] = useState<Service[]>([]);
+  const [sortKey, setSortKey] = useState<'name' | 'category'>('name');
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -92,7 +94,11 @@ export const AdminServices = () => {
     return () => unsub();
   }, []);
 
-  const [isPopulating, setIsPopulating] = useState(false);
+  const sortedServices = [...services].sort((a, b) => {
+    if (sortKey === 'name') return a.name.localeCompare(b.name);
+    if (sortKey === 'category') return (a.category || '').localeCompare(b.category || '');
+    return 0;
+  });
 
   const handleSave = async () => {
     try {
@@ -109,24 +115,38 @@ export const AdminServices = () => {
     }
   };
 
-  const handleSeedStandardServices = async () => {
-    if (!confirm("This will populate missing standard services. Are you sure?")) return;
-    setIsPopulating(true);
-    try {
-       for (const standard of STANDARD_SERVICES) {
-         // Optionally we could check for existence, but simplest is to just add them
-         await addDoc(collection(db, 'services'), standard);
-       }
-    } catch (e) {
-       console.error("Failed to seed services", e);
-    } finally {
-       setIsPopulating(false);
+  const handleDelete = async (id: string) => {
+    console.log("Attempting to delete service:", id);
+    if (confirm("Are you sure you want to delete this service?")) {
+      try {
+        await deleteDoc(doc(db, 'services', id));
+        setSelectedIds(prev => prev.filter(selectedId => selectedId !== id));
+        console.log("Successfully deleted service:", id);
+      } catch (e) {
+        console.error("Failed to delete service", e);
+      }
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Are you sure you want to delete this service?")) {
-      await deleteDoc(doc(db, 'services', id));
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(sid => sid !== id) : [...prev, id]
+    );
+  };
+
+  const handleDeleteSelected = async () => {
+    console.log("Attempting to delete selected services:", selectedIds);
+    if (
+      selectedIds.length > 0 &&
+      confirm(`Are you sure you want to delete ${selectedIds.length} selected services?`)
+    ) {
+      try {
+        await Promise.all(selectedIds.map((id) => deleteDoc(doc(db, 'services', id))));
+        console.log("Successfully deleted selected services");
+        setSelectedIds([]);
+      } catch (e) {
+        console.error('Failed to delete selected services', e);
+      }
     }
   };
 
@@ -135,9 +155,19 @@ export const AdminServices = () => {
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-manrope font-bold text-2xl text-ink-depth">Manage Services</h3>
         <div className="flex gap-3">
-          <button onClick={handleSeedStandardServices} disabled={isPopulating} className="bg-primary/10 text-primary border border-primary/30 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-primary/20 transition disabled:opacity-50">
-            {isPopulating ? 'Populating...' : 'Populate Standard Data'}
-          </button>
+          {selectedIds.length > 0 && (
+            <button onClick={handleDeleteSelected} className="bg-error/10 text-error border border-error/30 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-error/20 transition">
+              Delete Selected ({selectedIds.length})
+            </button>
+          )}
+          <select 
+            value={sortKey} 
+            onChange={(e) => setSortKey(e.target.value as 'name' | 'category')} 
+            className="px-4 py-2 rounded-xl bg-surface-container-low border border-outline-variant/30 text-sm font-bold text-ink-depth focus:outline-primary"
+          >
+            <option value="name">Sort by Name</option>
+            <option value="category">Sort by Category</option>
+          </select>
           <button onClick={() => { setIsAdding(true); setEditingId(null); setFormData({ name: '', description: '', rate: '', unit: '', category: 'Treatments', group: '' }); }} className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow hover:bg-emerald-700 transition">
             + Add Service
           </button>
@@ -165,14 +195,17 @@ export const AdminServices = () => {
       )}
 
       <div className="space-y-4">
-        {services.map(s => (
+        {sortedServices.map(s => (
           <div key={s.id} className="p-5 border border-outline-variant/50 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-surface-container">
-            <div>
-              <div className="flex items-center gap-2 mb-2 flex-wrap">
-                 <h4 className="font-manrope font-bold text-lg text-ink-depth">{s.name}</h4>
-                 <span className="bg-primary/20 px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider text-primary">{s.category}{s.group ? ` • ${s.group}` : ''}</span>
+            <div className="flex items-center gap-3">
+              <input type="checkbox" checked={selectedIds.includes(s.id)} onChange={() => toggleSelect(s.id)} className="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary" />
+              <div>
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <h4 className="font-manrope font-bold text-lg text-ink-depth">{s.name}</h4>
+                  <span className="bg-primary/20 px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider text-primary">{s.category}{s.group ? ` • ${s.group}` : ''}</span>
+                </div>
+                <p className="text-sm text-on-surface-variant max-w-xl">{s.description}</p>
               </div>
-              <p className="text-sm text-on-surface-variant max-w-xl">{s.description}</p>
             </div>
             <div className="flex items-center gap-6 shrink-0 md:pl-4 md:border-l border-outline-variant/30">
               <div className="text-right">

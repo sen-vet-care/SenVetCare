@@ -99,5 +99,13 @@ service cloud.firestore {
       allow update: if true;
       allow delete: if true;
     }
+
+    match /triage_reports/{reportId} {
+      allow get: if isOwner(existing().ownerId) || isAdmin() || exists(/databases/$(database)/documents/doctors/$(request.auth.uid));
+      allow list: if isOwner(resource.data.ownerId) || isAdmin() || exists(/databases/$(database)/documents/doctors/$(request.auth.uid));
+      allow create: if isOwner(incoming().ownerId) || isAdmin();
+      allow update: if false; // Reports should be immutable
+      allow delete: if isAdmin();
+    }
   }
 }

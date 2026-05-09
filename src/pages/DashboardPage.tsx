@@ -11,11 +11,13 @@ import { AppointmentsPanel } from '../components/dashboard/AppointmentsPanel';
 import { RecordsPanel } from '../components/dashboard/RecordsPanel';
 import { SeedDataButton } from '../components/dashboard/SeedDataButton';
 import { AdminOverviewPanel } from '../components/dashboard/AdminOverviewPanel';
+import { PetOwnerSettings } from '../components/dashboard/PetOwnerSettings';
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userName, setUserName] = useState<string>('');
+  const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -37,6 +39,7 @@ export const DashboardPage = () => {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         if (userDoc.exists()) {
           const data = userDoc.data();
+          setUserProfile(data);
           const isAdminEmail = ['senvetcare@gmail.com', 'contact@senvetcare.com', 'drtbsmemorialvetclinic@gmail.com'].includes(user.email?.toLowerCase() || '');
           const role = isAdminEmail ? 'admin' : (data.role || 'pet-owner');
           setUserRole(role);

@@ -1,0 +1,20 @@
+{
+  "name": "Sen Vet Care",
+  "short_name": "SenVetCare",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0D0D0F",
+  "theme_color": "#6EE7B7",
+  "icons": [
+    {
+      "src": "https://ik.imagekit.io/senvetcare/Logo/Logo%20Trans.webp",
+      "sizes": "192x192",
+      "type": "image/webp"
+    },
+    {
+      "src": "https://ik.imagekit.io/senvetcare/Logo/Logo%20Trans.webp",
+      "sizes": "512x512",
+      "type": "image/webp"
+    }
+  ]
+}

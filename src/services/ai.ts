@@ -53,16 +53,24 @@ JSON Schema format to follow:
   "options": ["Option 1", "Option 2", "Others"], // Empty if complete
   "report": null | {
     "urgencyLevel": "RED" | "ORANGE" | "GREEN",
+    "clinicalAlertRationale": "Detailed explaination of the specific clinical findings (e.g., vital signs, specific symptoms) that warranted this urgency level.",
     "consultationId": "LILY-RPT-YYYYMMDD-XXXX",
-    "summary": "Plain language recap of everything the owner described, written warmly as if confirming understanding.",
+    "soap": {
+       "subjective": "What the owner reported (history, environment, lifestyle).",
+       "objective": "Vitals, triage assessment, and visible observations.",
+       "assessment": "Provisional triage interpretation, potential causes, and clinical impression.",
+       "plan": "Immediate actions, diagnostic recommendations, and home care strategy."
+    },
     "differentialDiagnoses": [
        { 
          "condition": "Condition Name", 
          "probability": 67, 
-         "reasoning": "Specific explanation of WHY based on inputs. Mention symptoms provided." 
+         "reasoning": "Specific explanation of WHY based on inputs." 
        }
     ],
-    "recommendedTests": ["Test Name 1", "Test Name 2"],
+    "recommendedTests": [
+      { "testName": "Test Name", "description": "Brief, non-technical explanation to the owner why this test is proposed." }
+    ],
     "clinicDiagnosticServices": [
        { "service": "Service Name", "inHouse": true, "description": "Short benefit of this test" }
     ],

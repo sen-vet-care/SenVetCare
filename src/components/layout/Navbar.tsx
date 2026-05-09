@@ -8,7 +8,27 @@ export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const location = useLocation();
+
+  useEffect(() => {
+    window.addEventListener('beforeinstallprompt', (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    });
+  }, []);
+
+  const handleInstall = () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult: any) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the A2HS prompt');
+        }
+        setDeferredPrompt(null);
+      });
+    }
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -47,20 +67,20 @@ export const Navbar = () => {
 
             <div className="hidden lg:flex items-center gap-1">
               <div className="relative group">
-                <button className="text-on-surface-variant hover:text-white hover:bg-white/5 transition-all duration-300 px-4 py-2.5 rounded-full flex items-center gap-1">
+                <button className={`hover:text-white hover:bg-white/5 transition-all duration-300 px-4 py-2.5 rounded-full flex items-center gap-1 ${['/treatments', '/preventions', '/diagnostics', '/pharmacy'].includes(location.pathname) ? 'text-white bg-white/10' : 'text-on-surface-variant'}`}>
                   Services
                   <span className="material-symbols-outlined text-[14px]">expand_more</span>
                 </button>
                 <div className="absolute top-full left-0 pt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
                   <div className="bg-[#1C1C22] border border-[#2A2A35] rounded-2xl shadow-xl shadow-black/50 flex flex-col py-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-                    <Link to="/treatments" className="px-4 py-2.5 hover:bg-white/5 text-[#A0A0B0] hover:text-white transition-colors">Treatments</Link>
-                    <Link to="/preventions" className="px-4 py-2.5 hover:bg-white/5 text-[#A0A0B0] hover:text-white transition-colors">Preventions</Link>
-                    <Link to="/diagnostics" className="px-4 py-2.5 hover:bg-white/5 text-[#A0A0B0] hover:text-white transition-colors">Lab Tests & Diagnostics</Link>
-                    <Link to="/pharmacy" className="px-4 py-2.5 hover:bg-white/5 text-[#A0A0B0] hover:text-white transition-colors">Pharmacy</Link>
+                    <Link to="/treatments" className={`px-4 py-2.5 hover:bg-white/5 transition-colors ${location.pathname === '/treatments' ? 'text-white bg-white/5' : 'text-[#A0A0B0]'}`}>Treatments</Link>
+                    <Link to="/preventions" className={`px-4 py-2.5 hover:bg-white/5 transition-colors ${location.pathname === '/preventions' ? 'text-white bg-white/5' : 'text-[#A0A0B0]'}`}>Preventions</Link>
+                    <Link to="/diagnostics" className={`px-4 py-2.5 hover:bg-white/5 transition-colors ${location.pathname === '/diagnostics' ? 'text-white bg-white/5' : 'text-[#A0A0B0]'}`}>Lab Tests & Diagnostics</Link>
+                    <Link to="/pharmacy" className={`px-4 py-2.5 hover:bg-white/5 transition-colors ${location.pathname === '/pharmacy' ? 'text-white bg-white/5' : 'text-[#A0A0B0]'}`}>Pharmacy</Link>
                   </div>
                 </div>
               </div>
-              <Link to="/stories" className="text-on-surface-variant hover:text-white hover:bg-white/5 transition-all duration-300 px-4 py-2.5 rounded-full font-serif italic lowercase text-sm">Stories</Link>
+              <Link to="/stories" className={`hover:text-white hover:bg-white/5 transition-all duration-300 px-4 py-2.5 rounded-full font-serif italic lowercase text-sm ${location.pathname === '/stories' ? 'text-white bg-white/5' : 'text-on-surface-variant'}`}>Stories</Link>
             </div>
           </div>
 

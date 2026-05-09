@@ -24,11 +24,11 @@ const DoctorCard = ({ doc, idx }: { doc: any; idx: number }) => {
       className="group relative bg-surface rounded-3xl overflow-hidden border border-outline-variant/30 hover:border-primary/50 hover:shadow-lg transition-all duration-500 ease-in-out flex flex-col cursor-pointer"
     >
       <div className="relative h-56 overflow-hidden bg-surface-container">
-        {doc.image_url ? (
+        {doc.imageUrl ? (
           <img
             loading="lazy"
             decoding="async"
-            src={doc.image_url}
+            src={doc.imageUrl}
             alt={doc.name}
             className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out transform group-hover:scale-105"
           />
