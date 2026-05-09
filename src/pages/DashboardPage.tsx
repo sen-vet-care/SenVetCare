@@ -10,6 +10,7 @@ import { PatientsPanel } from '../components/dashboard/PatientsPanel';
 import { AppointmentsPanel } from '../components/dashboard/AppointmentsPanel';
 import { RecordsPanel } from '../components/dashboard/RecordsPanel';
 import { SeedDataButton } from '../components/dashboard/SeedDataButton';
+import { AdminOverviewPanel } from '../components/dashboard/AdminOverviewPanel';
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
@@ -117,7 +118,7 @@ export const DashboardPage = () => {
         <div className="lg:col-span-3 space-y-2">
           <button 
             onClick={() => setActiveTab('overview')}
-            className={`w-full text-left px-5 py-4 rounded-2xl font-inter font-bold text-sm flex items-center gap-4 transition-colors ${activeTab === 'overview' ? 'bg-emerald-50 text-primary border border-emerald-100' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-ink-depth'}`}>
+            className={`w-full text-left px-5 py-4 rounded-2xl font-inter font-bold text-sm flex items-center gap-4 transition-colors ${activeTab === 'overview' ? 'bg-primary/20 text-primary border border-primary/30' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-ink-depth'}`}>
             <span className="material-symbols-outlined">dashboard</span>
             Overview
           </button>
@@ -125,7 +126,7 @@ export const DashboardPage = () => {
           {userRole === 'pet-owner' && (
             <button 
               onClick={() => setActiveTab('pets')}
-              className={`w-full text-left px-5 py-4 rounded-2xl font-inter font-medium text-sm flex items-center gap-4 transition-colors ${activeTab === 'pets' ? 'bg-emerald-50 text-primary border border-emerald-100' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-ink-depth'}`}>
+              className={`w-full text-left px-5 py-4 rounded-2xl font-inter font-medium text-sm flex items-center gap-4 transition-colors ${activeTab === 'pets' ? 'bg-primary/20 text-primary border border-primary/30' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-ink-depth'}`}>
               <span className="material-symbols-outlined">pets</span>
               My Pets
             </button>
@@ -134,7 +135,7 @@ export const DashboardPage = () => {
           {(userRole === 'vets' || userRole === 'admin') && (
             <button 
               onClick={() => setActiveTab('patients')}
-              className={`w-full text-left px-5 py-4 rounded-2xl font-inter font-medium text-sm flex items-center gap-4 transition-colors ${activeTab === 'patients' ? 'bg-emerald-50 text-primary border border-emerald-100' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-ink-depth'}`}>
+              className={`w-full text-left px-5 py-4 rounded-2xl font-inter font-medium text-sm flex items-center gap-4 transition-colors ${activeTab === 'patients' ? 'bg-primary/20 text-primary border border-primary/30' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-ink-depth'}`}>
               <span className="material-symbols-outlined">groups</span>
               Patients
             </button>
@@ -142,14 +143,14 @@ export const DashboardPage = () => {
 
           <button 
             onClick={() => setActiveTab('appointments')}
-            className={`w-full text-left px-5 py-4 rounded-2xl font-inter font-medium text-sm flex items-center gap-4 transition-colors ${activeTab === 'appointments' ? 'bg-emerald-50 text-primary border border-emerald-100' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-ink-depth'}`}>
+            className={`w-full text-left px-5 py-4 rounded-2xl font-inter font-medium text-sm flex items-center gap-4 transition-colors ${activeTab === 'appointments' ? 'bg-primary/20 text-primary border border-primary/30' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-ink-depth'}`}>
             <span className="material-symbols-outlined">event</span>
             Appointments
           </button>
 
           <button 
             onClick={() => setActiveTab('records')}
-            className={`w-full text-left px-5 py-4 rounded-2xl font-inter font-medium text-sm flex items-center gap-4 transition-colors ${activeTab === 'records' ? 'bg-emerald-50 text-primary border border-emerald-100' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-ink-depth'}`}>
+            className={`w-full text-left px-5 py-4 rounded-2xl font-inter font-medium text-sm flex items-center gap-4 transition-colors ${activeTab === 'records' ? 'bg-primary/20 text-primary border border-primary/30' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-ink-depth'}`}>
             <span className="material-symbols-outlined">history</span>
             Medical Records
           </button>
@@ -158,13 +159,13 @@ export const DashboardPage = () => {
             <>
               <button 
                 onClick={() => setActiveTab('doctors')}
-                className={`w-full text-left px-5 py-4 mt-8 rounded-2xl font-inter font-medium text-sm flex items-center gap-4 transition-colors ${activeTab === 'doctors' ? 'bg-emerald-50 text-primary border border-emerald-100' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-ink-depth'}`}>
+                className={`w-full text-left px-5 py-4 mt-8 rounded-2xl font-inter font-medium text-sm flex items-center gap-4 transition-colors ${activeTab === 'doctors' ? 'bg-primary/20 text-primary border border-primary/30' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-ink-depth'}`}>
                 <span className="material-symbols-outlined">local_hospital</span>
                 Doctors
               </button>
               <button 
                 onClick={() => setActiveTab('services')}
-                className={`w-full text-left px-5 py-4 rounded-2xl font-inter font-medium text-sm flex items-center gap-4 transition-colors ${activeTab === 'services' ? 'bg-emerald-50 text-primary border border-emerald-100' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-ink-depth'}`}>
+                className={`w-full text-left px-5 py-4 rounded-2xl font-inter font-medium text-sm flex items-center gap-4 transition-colors ${activeTab === 'services' ? 'bg-primary/20 text-primary border border-primary/30' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-ink-depth'}`}>
                 <span className="material-symbols-outlined">medical_services</span>
                 Services
               </button>
@@ -173,7 +174,7 @@ export const DashboardPage = () => {
           
           <button 
             onClick={() => setActiveTab('settings')}
-            className={`w-full text-left px-5 py-4 rounded-2xl font-inter font-medium text-sm flex items-center gap-4 transition-colors ${userRole !== 'admin' ? 'mt-8' : ''} ${activeTab === 'settings' ? 'bg-emerald-50 text-primary border border-emerald-100' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-ink-depth'}`}>
+            className={`w-full text-left px-5 py-4 rounded-2xl font-inter font-medium text-sm flex items-center gap-4 transition-colors ${userRole !== 'admin' ? 'mt-8' : ''} ${activeTab === 'settings' ? 'bg-primary/20 text-primary border border-primary/30' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-ink-depth'}`}>
              <span className="material-symbols-outlined">settings</span>
              Settings
           </button>
@@ -250,38 +251,43 @@ export const DashboardPage = () => {
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Main Widget 1 */}
-                <div className="bg-surface rounded-[2rem] p-8 shadow-sm border border-outline-variant/30">
-                   <h3 className="font-manrope font-bold text-xl text-ink-depth mb-6">Recent Activity</h3>
-                   <div className="space-y-6">
-                     {/* Empty State */}
-                     <div className="flex flex-col items-center justify-center py-12 text-center">
-                        <div className="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center text-outline-variant mb-4">
-                          <span className="material-symbols-outlined text-3xl">inbox</span>
-                        </div>
-                        <h5 className="font-manrope font-bold text-ink-depth">No Recent Activity</h5>
-                        <p className="font-inter text-sm text-on-surface-variant mt-2 max-w-xs">Your latest appointments, pet records, and clinic updates will appear here.</p>
-                     </div>
-                   </div>
-                </div>
+                {userRole === 'admin' ? (
+                  <div className="col-span-1 lg:col-span-2">
+                    <AdminOverviewPanel />
+                  </div>
+                ) : (
+                  <>
+                    {/* Main Widget 1 */}
+                    <div className="bg-surface rounded-[2rem] p-8 shadow-sm border border-outline-variant/30">
+                       <h3 className="font-manrope font-bold text-xl text-ink-depth mb-6">Recent Activity</h3>
+                       <div className="space-y-6">
+                         {/* Empty State */}
+                         <div className="flex flex-col items-center justify-center py-12 text-center">
+                            <div className="w-16 h-16 bg-surface-container rounded-full flex items-center justify-center text-outline-variant mb-4">
+                              <span className="material-symbols-outlined text-3xl">inbox</span>
+                            </div>
+                            <h5 className="font-manrope font-bold text-ink-depth">No Recent Activity</h5>
+                            <p className="font-inter text-sm text-on-surface-variant mt-2 max-w-xs">Your latest appointments, pet records, and clinic updates will appear here.</p>
+                         </div>
+                       </div>
+                    </div>
 
-                {/* Dr Lily AI Insight Widget */}
-                {userRole !== 'admin' && (
-                  <div className="bg-gradient-to-br from-zinc-900 to-black rounded-[2rem] p-8 shadow-xl text-white relative overflow-hidden">
-                     <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full mix-blend-screen pointer-events-none"></div>
-                     <div className="flex items-center gap-3 mb-6">
-                       <span className="material-symbols-outlined text-emerald-400">smart_toy</span>
-                       <h3 className="font-manrope font-bold text-xl">Dr Lily AI Insights</h3>
-                     </div>
-                     
-                     <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
-                       <p className="font-inter text-zinc-300 text-sm leading-relaxed italic">
-                         "Hello {userName}, based on regional data, there is a spike in tick-borne illnesses this week. 
-                         Ensure your pets are up to date on preventatives before scheduling walks in wooded areas."
-                       </p>
-                       <div className="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
-                         <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">System generated alert</p>
-                         {userRole === 'pet-owner' ? (
+                    {/* Dr Lily AI Insight Widget */}
+                    <div className="bg-gradient-to-br from-zinc-900 to-black rounded-[2rem] p-8 shadow-xl text-white relative overflow-hidden">
+                       <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full mix-blend-screen pointer-events-none"></div>
+                       <div className="flex items-center gap-3 mb-6">
+                         <span className="material-symbols-outlined text-emerald-400">smart_toy</span>
+                         <h3 className="font-manrope font-bold text-xl">Dr Lily AI Insights</h3>
+                       </div>
+                       
+                       <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
+                         <p className="font-inter text-zinc-300 text-sm leading-relaxed italic">
+                           "Hello {userName}, based on regional data, there is a spike in tick-borne illnesses this week. 
+                           Ensure your pets are up to date on preventatives before scheduling walks in wooded areas."
+                         </p>
+                         <div className="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
+                           <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">System generated alert</p>
+                           {userRole === 'pet-owner' ? (
                            <button onClick={() => navigate('/dr-lily')} className="text-emerald-400 hover:text-emerald-300 text-sm font-bold flex items-center gap-1 transition-colors">
                              Ask Dr. Lily
                              <span className="material-symbols-outlined text-sm">arrow_forward</span>
@@ -295,6 +301,7 @@ export const DashboardPage = () => {
                        </div>
                      </div>
                   </div>
+                  </>
                 )}
               </div>
             </>

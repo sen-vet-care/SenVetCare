@@ -135,7 +135,7 @@ export const AdminServices = () => {
       <div className="flex justify-between items-center mb-6">
         <h3 className="font-manrope font-bold text-2xl text-ink-depth">Manage Services</h3>
         <div className="flex gap-3">
-          <button onClick={handleSeedStandardServices} disabled={isPopulating} className="bg-white text-primary border border-primary px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-emerald-50 transition disabled:opacity-50">
+          <button onClick={handleSeedStandardServices} disabled={isPopulating} className="bg-primary/10 text-primary border border-primary/30 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-primary/20 transition disabled:opacity-50">
             {isPopulating ? 'Populating...' : 'Populate Standard Data'}
           </button>
           <button onClick={() => { setIsAdding(true); setEditingId(null); setFormData({ name: '', description: '', rate: '', unit: '', category: 'Treatments', group: '' }); }} className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow hover:bg-emerald-700 transition">
@@ -146,48 +146,48 @@ export const AdminServices = () => {
 
       {(isAdding || editingId) && (
         <div className="mb-8 p-6 bg-surface-container-low border border-outline-variant/30 rounded-2xl grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input className="px-4 py-3 bg-white border border-outline-variant rounded-xl text-zinc-900 placeholder:text-zinc-400" placeholder="Service Name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
-          <select className="px-4 py-3 bg-white border border-outline-variant rounded-xl text-zinc-900" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
+          <input className="px-4 py-3 bg-surface border border-outline-variant/50 rounded-xl text-ink-depth placeholder:text-on-surface-variant focus:outline-primary focus:border-primary" placeholder="Service Name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+          <select className="px-4 py-3 bg-surface border border-outline-variant/50 rounded-xl text-ink-depth focus:outline-primary focus:border-primary" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}>
             <option value="Treatments">Treatments</option>
             <option value="Preventions">Preventions</option>
             <option value="Lab Tests">Lab Tests</option>
             <option value="Pharmacy">Pharmacy</option>
           </select>
-          <input className="px-4 py-3 bg-white border border-outline-variant rounded-xl text-zinc-900 placeholder:text-zinc-400" placeholder="Group (e.g. Consultations)" value={formData.group} onChange={e => setFormData({...formData, group: e.target.value})} />
-          <input className="px-4 py-3 bg-white border border-outline-variant rounded-xl text-zinc-900 placeholder:text-zinc-400" placeholder="Rate (e.g. 500 - 1000)" type="text" value={formData.rate} onChange={e => setFormData({...formData, rate: e.target.value})} />
-          <input className="px-4 py-3 bg-white border border-outline-variant rounded-xl text-zinc-900 placeholder:text-zinc-400" placeholder="Unit (e.g. per session)" value={formData.unit} onChange={e => setFormData({...formData, unit: e.target.value})} />
-          <input className="px-4 py-3 bg-white border border-outline-variant rounded-xl md:col-span-2 text-zinc-900 placeholder:text-zinc-400" placeholder="Description" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+          <input className="px-4 py-3 bg-surface border border-outline-variant/50 rounded-xl text-ink-depth placeholder:text-on-surface-variant focus:outline-primary focus:border-primary" placeholder="Group (e.g. Consultations)" value={formData.group} onChange={e => setFormData({...formData, group: e.target.value})} />
+          <input className="px-4 py-3 bg-surface border border-outline-variant/50 rounded-xl text-ink-depth placeholder:text-on-surface-variant focus:outline-primary focus:border-primary" placeholder="Rate (e.g. 500 - 1000)" type="text" value={formData.rate} onChange={e => setFormData({...formData, rate: e.target.value})} />
+          <input className="px-4 py-3 bg-surface border border-outline-variant/50 rounded-xl text-ink-depth placeholder:text-on-surface-variant focus:outline-primary focus:border-primary" placeholder="Unit (e.g. per session)" value={formData.unit} onChange={e => setFormData({...formData, unit: e.target.value})} />
+          <input className="px-4 py-3 bg-surface border border-outline-variant/50 rounded-xl md:col-span-2 text-ink-depth placeholder:text-on-surface-variant focus:outline-primary focus:border-primary" placeholder="Description" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
           <div className="md:col-span-2 flex gap-3 mt-2">
             <button onClick={handleSave} className="bg-ink-depth text-white px-6 py-2.5 rounded-xl font-bold hover:bg-black transition text-sm">Save</button>
-            <button onClick={() => { setIsAdding(false); setEditingId(null); }} className="px-6 py-2.5 rounded-xl font-bold bg-white text-zinc-900 border border-outline-variant hover:bg-zinc-50 transition text-sm">Cancel</button>
+            <button onClick={() => { setIsAdding(false); setEditingId(null); }} className="px-6 py-2.5 rounded-xl font-bold bg-surface text-ink-depth border border-outline-variant hover:bg-surface-container-low transition text-sm">Cancel</button>
           </div>
         </div>
       )}
 
       <div className="space-y-4">
         {services.map(s => (
-          <div key={s.id} className="p-5 border border-outline-variant/50 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white/50">
+          <div key={s.id} className="p-5 border border-outline-variant/50 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-surface-container">
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                 <h4 className="font-bold text-lg text-ink-depth">{s.name}</h4>
-                 <span className="bg-surface-container px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider text-zinc-500">{s.category}{s.group ? ` • ${s.group}` : ''}</span>
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                 <h4 className="font-manrope font-bold text-lg text-ink-depth">{s.name}</h4>
+                 <span className="bg-primary/20 px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider text-primary">{s.category}{s.group ? ` • ${s.group}` : ''}</span>
               </div>
               <p className="text-sm text-on-surface-variant max-w-xl">{s.description}</p>
             </div>
-            <div className="flex items-center gap-6 shrink-0">
+            <div className="flex items-center gap-6 shrink-0 md:pl-4 md:border-l border-outline-variant/30">
               <div className="text-right">
-                <p className="font-bold text-emerald-600 text-lg">₹{s.rate}</p>
-                <p className="text-xs text-zinc-500 uppercase tracking-wider">{s.unit}</p>
+                <p className="font-bold text-primary text-lg">₹{s.rate}</p>
+                <p className="text-xs text-on-surface-variant uppercase tracking-wider">{s.unit}</p>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={() => { setEditingId(s.id); setFormData({ name: s.name, description: s.description, rate: String(s.rate), unit: s.unit, category: s.category || 'Treatments', group: s.group || '' }); }} className="p-2 text-zinc-500 hover:text-blue-600 bg-surface-container rounded-lg transition"><span className="material-symbols-outlined text-sm">edit</span></button>
-                <button onClick={() => handleDelete(s.id)} className="p-2 text-zinc-500 hover:text-red-600 bg-surface-container rounded-lg transition"><span className="material-symbols-outlined text-sm">delete</span></button>
+                <button onClick={() => { setEditingId(s.id); setFormData({ name: s.name, description: s.description, rate: String(s.rate), unit: s.unit, category: s.category || 'Treatments', group: s.group || '' }); }} className="p-2 text-on-surface-variant hover:text-primary bg-surface-container-highest rounded-lg transition"><span className="material-symbols-outlined text-sm">edit</span></button>
+                <button onClick={() => handleDelete(s.id)} className="p-2 text-on-surface-variant hover:text-error bg-surface-container-highest rounded-lg transition"><span className="material-symbols-outlined text-sm">delete</span></button>
               </div>
             </div>
           </div>
         ))}
         {services.length === 0 && !isAdding && (
-          <p className="text-zinc-500 text-center py-8">No services found. Add one above!</p>
+          <p className="text-on-surface-variant text-center py-8">No services found. Add one above!</p>
         )}
       </div>
     </div>

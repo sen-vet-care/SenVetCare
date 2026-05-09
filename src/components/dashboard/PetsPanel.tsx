@@ -61,12 +61,12 @@ export const PetsPanel = () => {
 
       {isAddingPet && (
         <form onSubmit={handleAddPet} className="mb-8 p-6 bg-surface-container-low border border-outline-variant/30 rounded-2xl grid grid-cols-1 md:grid-cols-3 gap-4">
-          <input required placeholder="Pet Name" value={newPet.petName} onChange={e => setNewPet({...newPet, petName: e.target.value})} className="px-4 py-3 bg-white border border-outline-variant rounded-xl text-sm text-zinc-900 placeholder:text-zinc-500" />
-          <input required placeholder="Species (e.g. Dog, Cat)" value={newPet.species} onChange={e => setNewPet({...newPet, species: e.target.value})} className="px-4 py-3 bg-white border border-outline-variant rounded-xl text-sm text-zinc-900 placeholder:text-zinc-500" />
-          <input placeholder="Breed (Optional)" value={newPet.breed} onChange={e => setNewPet({...newPet, breed: e.target.value})} className="px-4 py-3 bg-white border border-outline-variant rounded-xl text-sm text-zinc-900 placeholder:text-zinc-500" />
+          <input required placeholder="Pet Name" value={newPet.petName} onChange={e => setNewPet({...newPet, petName: e.target.value})} className="px-4 py-3 bg-surface border border-outline-variant/50 rounded-xl text-sm text-ink-depth placeholder:text-on-surface-variant focus:outline-primary" />
+          <input required placeholder="Species (e.g. Dog, Cat)" value={newPet.species} onChange={e => setNewPet({...newPet, species: e.target.value})} className="px-4 py-3 bg-surface border border-outline-variant/50 rounded-xl text-sm text-ink-depth placeholder:text-on-surface-variant focus:outline-primary" />
+          <input placeholder="Breed (Optional)" value={newPet.breed} onChange={e => setNewPet({...newPet, breed: e.target.value})} className="px-4 py-3 bg-surface border border-outline-variant/50 rounded-xl text-sm text-ink-depth placeholder:text-on-surface-variant focus:outline-primary" />
           <div className="md:col-span-3 flex gap-3 mt-2">
             <button type="submit" className="bg-ink-depth text-white px-6 py-2.5 rounded-xl font-bold hover:bg-black transition text-sm">Save Pet</button>
-            <button type="button" onClick={() => setIsAddingPet(false)} className="px-6 py-2.5 rounded-xl font-bold bg-white text-zinc-900 border border-outline-variant hover:bg-zinc-50 transition text-sm">Cancel</button>
+            <button type="button" onClick={() => setIsAddingPet(false)} className="px-6 py-2.5 rounded-xl font-bold bg-surface text-ink-depth border border-outline-variant hover:bg-surface-container-low transition text-sm">Cancel</button>
           </div>
         </form>
       )}
@@ -82,7 +82,7 @@ export const PetsPanel = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {pets.map(pet => (
-            <div key={pet.id} className="p-5 border border-outline-variant/50 rounded-2xl flex gap-4 items-center bg-white">
+            <div key={pet.id} className="p-5 border border-outline-variant/50 rounded-2xl flex gap-4 items-center bg-surface-container">
               <div className="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center text-ink-depth font-bold text-xl uppercase shrink-0">
                 {pet.petName?.charAt(0) || '?'}
               </div>

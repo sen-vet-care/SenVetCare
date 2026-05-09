@@ -3,11 +3,17 @@ import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 
 const DEMO_DOCTORS = [
-  { name: 'Dr. John Smith', specialty: 'General Veterinary Care', timings: '10:00 AM - 4:00 PM', isPresent: true },
-  { name: 'Dr. Emily Davis', specialty: 'Veterinary Surgery', timings: '09:00 AM - 1:00 PM', isPresent: true },
-  { name: 'Dr. Michael Chen', specialty: 'Pet Dermatology', timings: '02:00 PM - 06:00 PM', isPresent: false },
-  { name: 'Dr. Sarah Wilson', specialty: 'Veterinary Dentistry', timings: '11:00 AM - 05:00 PM', isPresent: true },
-  { name: 'Dr. Robert Taylor', specialty: 'Feline Medicine', timings: '08:00 AM - 02:00 PM', isPresent: true },
+  { name: 'Dr. Chandreyee Sen', specialty: 'Clinical Medicine', days: 'Mon, Wed, Fri', timings: '06:00 PM - 08:00 PM', isPresent: true },
+  { name: 'Dr. Bithi Roy Chowdhury', specialty: 'Veterinary Surgeon', days: 'Tue, Thu, Sat', timings: '06:00 PM - 08:00 PM', isPresent: true },
+  { name: 'Dr. Arnab Maji', specialty: 'Veterinary Surgery', days: 'Mon - Fri', timings: '06:00 AM - 09:00 AM', isPresent: true },
+  { name: 'Dr. I. Murty', specialty: 'Feline Medicine', days: 'Mon-Fri', timings: '10:00 AM - 06:00 PM', isPresent: true },
+];
+
+const DEMO_RECORDS = [
+  { petName: 'Buddy', species: 'Dog', doctorName: 'Dr. Chandreyee Sen', date: new Date().toISOString(), type: 'General Checkup', notes: 'Patient is healthy, gave multivitamin supplements.', weight: '12.5 kg', nextVisit: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString() },
+  { petName: 'Luna', species: 'Cat', doctorName: 'Dr. I. Murty', date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 7).toISOString(), type: 'Feline Vaccination', notes: 'Administered annual FVRCP vaccine. Mild fever expected.', weight: '4.2 kg', nextVisit: new Date(Date.now() + 1000 * 60 * 60 * 24 * 365).toISOString() },
+  { petName: 'Max', species: 'Dog', doctorName: 'Dr. Arnab Maji', date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), type: 'Surgery Follow-up', notes: 'Incision site healing well. Sutures removed.', weight: '22.0 kg', nextVisit: null },
+  { petName: 'Bella', species: 'Dog', doctorName: 'Dr. Bithi Roy Chowdhury', date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 14).toISOString(), type: 'Skin Condition', notes: 'Prescribed anti-fungal shampoo and ointment for dermatitis on hind legs.', weight: '8.5 kg', nextVisit: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14).toISOString() },
 ];
 
 const DEMO_SERVICES = [
@@ -53,6 +59,9 @@ export const SeedDataButton = () => {
       }
       for (const appt of DEMO_APPOINTMENTS) {
         await addDoc(collection(db, 'appointments'), appt);
+      }
+      for (const rec of DEMO_RECORDS) {
+        await addDoc(collection(db, 'medical_records'), rec);
       }
       setMessage('Demo data seeded successfully!');
     } catch (error: any) {
