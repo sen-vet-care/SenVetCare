@@ -1155,69 +1155,108 @@ export const DrLilyPage = () => {
             )}
 
             {step === "result" && reportData && (
-              <motion.div
-                key="result"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="w-full min-h-screen text-white pb-24 flex flex-col items-center"
-              >
-                {/* AI Disclaimer Banner */}
-                <div className="bg-[#1C1C22]/80 backdrop-blur-md border-b border-[#2A2A35] py-3 px-6 sticky top-0 z-50 text-center w-full shadow-md">
-                  <p className="text-[10px] md:text-xs font-bold leading-relaxed max-w-4xl mx-auto text-[#A0A0B0]">
-                    ⚠️ Clinical Triage Assessment - For Professional Use Only.
-                  </p>
+  <motion.div
+    key="result"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    className="w-full min-h-screen bg-zinc-100 pb-24 flex flex-col items-center"
+  >
+    <div className="w-full flex justify-center py-12 px-2 sm:px-6 overflow-x-auto">
+      <div
+        id="lily-report-content"
+        className="w-full max-w-[794px] bg-white text-zinc-900 shadow-2xl p-8 sm:p-12 mb-8 relative flex flex-col"
+        style={{ minHeight: '1123px' }}
+      >
+        {/* Header - Clinic Info */}
+        <div className="flex border-b-2 border-emerald-800 pb-8 mb-8 items-start">
+            <img src="https://ik.imagekit.io/senvetcare/Logo/Logo%20Trans.webp" alt="Clinic Logo" className="w-24 h-24 object-contain mr-6"/>
+            <div className="flex-1">
+                <h1 className="font-serif font-black text-4xl text-emerald-900 leading-tight">Sen Vet Care</h1>
+                <p className="text-sm font-bold text-emerald-900/70 uppercase tracking-widest leading-snug">Legacy Dr. T. B. Sen Memorial Veterinary Clinic</p>
+                <div className="text-[10px] text-zinc-600 mt-2 space-y-0.5">
+                    <p>Address: 69, Dr. Suresh Sarkar Rd, Entally, Kolkata, West Bengal 700014</p>
+                    <p>Contact: 09871155162 | Email: contact@senvetcare.com</p>
+                    <p>Website: www.senvetcare.com | <a href="https://maps.app.goo.gl/c5VaPsCrPVsVcMYr6" className="text-emerald-700 underline" target="_blank">Google Map</a></p>
                 </div>
+            </div>
+            <div className="text-right text-xs text-zinc-500 font-mono">
+                <p>Ref ID: {reportData.consultationId}</p>
+                <p>{new Date().toLocaleDateString()}</p>
+            </div>
+        </div>
+        
+        {/* Patient/Owner Details */}
+        <div className="grid grid-cols-2 gap-8 mb-10 text-sm">
+            <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-200">
+                <h4 className="font-bold text-emerald-800 uppercase text-[10px] tracking-wider mb-1">Owner Details</h4>
+                <p className="font-bold">{formData.ownerName}</p>
+                <p className="text-zinc-600 text-xs">{formData.mobileNumber}</p>
+                <p className="text-zinc-600 text-xs">{formData.emailAddress}</p>
+            </div>
+            <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-200">
+                <h4 className="font-bold text-emerald-800 uppercase text-[10px] tracking-wider mb-1">Pet Details</h4>
+                <p className="font-bold">{formData.petName}</p>
+                <p className="text-zinc-600 text-xs">{formData.species} | {formData.breed}</p>
+                <p className="text-zinc-600 text-xs">{formData.age} {formData.ageUnit}</p>
+            </div>
+        </div>
 
-                <div className="w-full flex justify-center py-12 px-2 sm:px-6 overflow-x-auto">
-                  <div
-                    id="lily-report-content"
-                    className="w-full max-w-[794px] bg-white text-zinc-900 shadow-2xl p-8 sm:p-12 mb-8 relative"
-                    style={{ minHeight: '1123px' }}
-                  >
-                    {/* Header */}
-                    <div className="flex justify-between items-start border-b-4 border-emerald-800 pb-6 mb-6">
-                      <div>
-                        <h1 className="font-serif font-black text-3xl mb-1 text-emerald-800">SenVetCare</h1>
-                        <p className="text-[10px] font-bold uppercase tracking-widest">Tamal B. Sen Memorial Veterinary Clinic</p>
-                      </div>
-                      <div className="text-right text-xs">
-                        <p>Ref ID: {reportData.consultationId}</p>
-                        <p className="font-bold">{new Date().toLocaleDateString()}</p>
-                      </div>
-                    </div>
-                    
-                    {/* Clinical Alert */}
-                    <div className="bg-zinc-900 text-white p-4 mb-8">
-                       <h2 className="text-xs font-black uppercase tracking-widest text-[#6EE7B7] mb-2">Clinical Alert: {reportData.urgencyLevel} Priority</h2>
-                       <p className="text-xs italic leading-relaxed">{reportData.clinicalAlertRationale}</p>
-                    </div>
+        {/* Clinical Alert Section */}
+        <div className={`p-6 mb-8 border-2 ${
+            reportData.urgencyLevel === 'RED' ? 'border-red-600' :
+            reportData.urgencyLevel === 'ORANGE' ? 'border-orange-500' :
+            'border-emerald-600'
+        } bg-white`}>
+            <h2 className={`text-sm font-black uppercase tracking-widest mb-2 ${
+                reportData.urgencyLevel === 'RED' ? 'text-red-600' :
+                reportData.urgencyLevel === 'ORANGE' ? 'text-orange-600' :
+                'text-emerald-700'
+            }`}>
+               Clinical Alert: <span className="font-bold">{reportData.urgencyLevel}</span> Priority
+            </h2>
+            <p className="text-xs italic leading-relaxed text-zinc-800">{reportData.clinicalAlertRationale}</p>
+        </div>
 
-                    {/* SOAP Structure */}
-                    <div className="space-y-6">
-                        <section><h3 className="text-xs font-black uppercase tracking-widest text-emerald-800 border-b border-emerald-200 pb-1 mb-2">Subjective</h3><p className="text-sm text-zinc-700">{reportData.soap?.subjective}</p></section>
-                        <section><h3 className="text-xs font-black uppercase tracking-widest text-emerald-800 border-b border-emerald-200 pb-1 mb-2">Objective</h3><p className="text-sm text-zinc-700">{reportData.soap?.objective}</p></section>
-                        <section><h3 className="text-xs font-black uppercase tracking-widest text-emerald-800 border-b border-emerald-200 pb-1 mb-2">Assessment</h3><p className="text-sm text-zinc-700">{reportData.soap?.assessment}</p></section>
-                        <section><h3 className="text-xs font-black uppercase tracking-widest text-emerald-800 border-b border-emerald-200 pb-1 mb-2">Plan</h3><p className="text-sm text-zinc-700">{reportData.soap?.plan}</p></section>
-                    </div>
+        {/* SOAP Structure */}
+        <div className="space-y-6 flex-1">
+            <section><h3 className="text-xs font-black uppercase tracking-widest text-emerald-800 border-b border-emerald-200 pb-1 mb-2">Subjective</h3><p className="text-sm text-zinc-700">{reportData.soap?.subjective || 'N/A'}</p></section>
+            <section><h3 className="text-xs font-black uppercase tracking-widest text-emerald-800 border-b border-emerald-200 pb-1 mb-2">Objective</h3><p className="text-sm text-zinc-700">{reportData.soap?.objective || 'N/A'}</p></section>
+            <section><h3 className="text-xs font-black uppercase tracking-widest text-emerald-800 border-b border-emerald-200 pb-1 mb-2">Assessment</h3><p className="text-sm text-zinc-700">{reportData.soap?.assessment || 'N/A'}</p></section>
+            <section><h3 className="text-xs font-black uppercase tracking-widest text-emerald-800 border-b border-emerald-200 pb-1 mb-2">Plan</h3><p className="text-sm text-zinc-700">{reportData.soap?.plan || 'N/A'}</p></section>
+        </div>
 
-                    {/* Recommended Diagnostics */}
-                    {reportData.recommendedTests?.length > 0 && (
-                      <div className="mt-8">
-                        <h3 className="text-xs font-black uppercase tracking-widest text-zinc-800 border-b border-zinc-200 pb-2 mb-4">Diagnostic Recommendations</h3>
-                        <div className="space-y-3">
-                          {reportData.recommendedTests.map((t: any, i: number) => (
-                            <div key={i} className="text-sm">
-                               <p className="font-bold text-emerald-800 mt-1">{t.testName}</p>
-                               <p className="text-xs text-zinc-600 font-sans italic">{t.description}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+        {/* Recommended Diagnostics */}
+        {reportData.recommendedTests?.length > 0 && (
+            <div className="mt-8 border-t border-zinc-200 pt-8">
+            <h3 className="text-sm font-black uppercase tracking-widest text-zinc-800 border-b border-zinc-200 pb-2 mb-4">Diagnostic Recommendations</h3>
+            <div className="space-y-4">
+                {reportData.recommendedTests.map((t: any, i: number) => (
+                <div key={i} className="text-sm">
+                    <p className="font-bold text-emerald-800">{t.testName}</p>
+                    <p className="text-xs text-zinc-600 italic">{t.description}</p>
                 </div>
-              </motion.div>
-            )}
+                ))}
+            </div>
+            </div>
+        )}
+
+        {/* Footer CTA & Disclaimer */}
+        <div className="mt-auto pt-12 border-t border-zinc-200">
+            <div className="flex gap-4 justify-center mb-6">
+                <a href="tel:09871155162" className="bg-emerald-800 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-emerald-700 transition">Call Now</a>
+                <a href="https://wa.me/919871155162" className="bg-emerald-600 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-emerald-500 transition">WhatsApp</a>
+                <a href="/booking" className="bg-emerald-800 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-emerald-700 transition">Book Visit</a>
+            </div>
+            <p className="text-[9px] text-zinc-500 text-center leading-relaxed italic border-t border-zinc-100 pt-4">
+                Disclaimer: This triage assessment is generated by an AI assistant for professional veterinary use only.
+                It is not a substitute for a physical consultation. Decisions based on this report are at the discretion of the veterinary practitioner. This is an AI-generated document.
+            </p>
+            <p className="text-center text-xs text-zinc-400 mt-4 font-mono">Page 1 of 1</p>
+        </div>
+      </div>
+    </div>
+  </motion.div>
+)}
           </AnimatePresence>
         </div>
       </div>

@@ -213,8 +213,8 @@ export const AdminServices = () => {
                 <p className="text-xs text-on-surface-variant uppercase tracking-wider">{s.unit}</p>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={() => { setEditingId(s.id); setFormData({ name: s.name, description: s.description, rate: String(s.rate), unit: s.unit, category: s.category || 'Treatments', group: s.group || '' }); }} className="p-2 text-on-surface-variant hover:text-primary bg-surface-container-highest rounded-lg transition"><span className="material-symbols-outlined text-sm">edit</span></button>
-                <button onClick={() => handleDelete(s.id)} className="p-2 text-on-surface-variant hover:text-error bg-surface-container-highest rounded-lg transition"><span className="material-symbols-outlined text-sm">delete</span></button>
+                <button onClick={(e) => { e.stopPropagation(); setEditingId(s.id); setFormData({ name: s.name, description: s.description, rate: String(s.rate), unit: s.unit, category: s.category || 'Treatments', group: s.group || '' }); }} className="p-2 text-on-surface-variant hover:text-primary bg-surface-container-highest rounded-lg transition"><span className="material-symbols-outlined text-sm">edit</span></button>
+                <button onClick={(e) => { e.stopPropagation(); handleDelete(s.id); }} className="p-2 text-on-surface-variant hover:text-error bg-surface-container-highest rounded-lg transition"><span className="material-symbols-outlined text-sm">delete</span></button>
               </div>
             </div>
           </div>

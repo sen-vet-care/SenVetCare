@@ -5,6 +5,7 @@ import { doc, getDoc, collection, query, where, getDocs, updateDoc } from 'fireb
 import { motion } from 'motion/react';
 import { AdminServices } from '../components/dashboard/AdminServices';
 import { AdminDoctors } from '../components/dashboard/AdminDoctors';
+import { AdminRecordsPanel } from '../components/dashboard/AdminRecordsPanel';
 import { PetsPanel } from '../components/dashboard/PetsPanel';
 import { PatientsPanel } from '../components/dashboard/PatientsPanel';
 import { AppointmentsPanel } from '../components/dashboard/AppointmentsPanel';
@@ -172,6 +173,12 @@ export const DashboardPage = () => {
                 <span className="material-symbols-outlined">medical_services</span>
                 Services
               </button>
+              <button 
+                onClick={() => setActiveTab('all-records')}
+                className={`w-full text-left px-5 py-4 rounded-2xl font-inter font-medium text-sm flex items-center gap-4 transition-colors ${activeTab === 'all-records' ? 'bg-primary/20 text-primary border border-primary/30' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-ink-depth'}`}>
+                <span className="material-symbols-outlined">folder_shared</span>
+                All Records
+              </button>
             </>
           )}
           
@@ -313,6 +320,8 @@ export const DashboardPage = () => {
           {activeTab === 'doctors' && userRole === 'admin' && <AdminDoctors />}
           
           {activeTab === 'services' && userRole === 'admin' && <AdminServices />}
+
+          {activeTab === 'all-records' && userRole === 'admin' && <AdminRecordsPanel />}
 
           {activeTab === 'pets' && userRole === 'pet-owner' && <PetsPanel />}
           

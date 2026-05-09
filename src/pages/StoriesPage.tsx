@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { AnimatePresence, motion } from 'motion/react';
+import kolkataBlog1Image from '../assets/images/regenerated_image_1778341585066.png';
+import kolkataBlog2Image from '../assets/images/regenerated_image_1778341795597.png';
+import kolkataBlog3Image from '../assets/images/regenerated_image_1778341787279.png';
+import kolkataBlog4Image from '../assets/images/regenerated_image_1778341791415.png';
+import kolkataBlog5Image from '../assets/images/regenerated_image_1778341799544.png';
 
 // Provide a type for our blog post
 interface BlogPost {
@@ -18,6 +23,46 @@ interface BlogPost {
 
 const PLACEHOLDER_BLOGS: BlogPost[] = [
   {
+    id: 'kolkata-blog-1',
+    title: 'Essential Vaccinations for Pets in Kolkata’s Climate',
+    excerpt: 'Protecting your pet goes beyond basic care. Here is your guide to essential vaccinations tailored for the humid and varied climate of Kolkata.',
+    content: 'Kolkata\'s humid climate and urban density increase the risk of infectious diseases for our pets. Vaccination isn\'t just about law; it\'s about creating a strong defense system. Core vaccines for dogs in our region include Protections against Canine Distemper, Parvovirus, Infectious Hepatitis (DHLPP), and Rabies. For cats, the FVRCP vaccine (Feline Viral Rhinotracheitis, Calicivirus, Panleukopenia) and Rabies vaccine are essential. Depending on your pet\'s lifestyle and exposure, we may also recommend non-core vaccines like those for Leptospirosis, which is highly prevalent in Kolkata due to the monsoon water and open drainage systems. \n\nAlways ensure your pet is up to date on these boosters, as immunity wanes over time. Consult with our clinic to customize a vaccination schedule that best fits your pet’s age, health status, and lifestyle.',
+    category: 'Doctor\'s Speak',
+    language: 'EN',
+    read_time: '4 min read',
+    image_url: kolkataBlog1Image,
+  },
+  {
+    id: 'kolkata-blog-2',
+    title: 'Managing Your Pet’s Heatstroke Risk During Kolkata Summers',
+    excerpt: 'As mercury levels climb in Kolkata, the risk of heatstroke in pets increases dramatically. Here is what to watch for and how to keep them cool.',
+    content: 'The intense summer heat in Kolkata is a significant challenge for pets, who don\'t sweat like us. Heatstroke can happen fast. Watch for excessive panting, drooling, bright red gums, incoordination, and collapse. \n\nKey strategies for survival: Walk during the coolest times—very early morning or late night. Keep them indoors in ventilated spaces. Ensure fresh, cool water is ALWAYS available. Use damp towels or cooling mats if needed. Never, EVER leave them in a parked car, even with windows down. If you notice signs, move them to a cooler area, apply cool (not ice-cold) water to their paws and belly, and rush to the clinic immediately.',
+    category: 'Pet News',
+    language: 'EN',
+    read_time: '3 min read',
+    image_url: kolkataBlog2Image,
+  },
+  {
+    id: 'kolkata-blog-3',
+    title: 'Common Skin Issues in Pets Due to Kolkata\'s Humidity',
+    excerpt: 'Dampness and heat in Kolkata are breeding grounds for skin infections. Learn to identify and prevent common dermatological problems in pets.',
+    content: 'The high humidity prevalent in Kolkata throughout much of the year makes pets particularly susceptible to fungal and bacterial skin infections, often referred to as "hot spots" or general dermatitis. You might notice your dog or cat intensely licking, scratching, or chewing at specific areas, or developing patchy hair loss, redness, or an unpleasant odor.\n\nPrevention tips: Regular grooming is crucial; ensure your pet’s coat is thoroughly dried after bathing, especially in folds for breeds like Pugs or Bulldogs. Maintain clean bedding and use flea/tick preventatives consistently, as flea bites often cause allergic reactions that lead to secondary skin infections. If you see signs, don\'t wait; it can spread rapidly, leading to increased discomfort and infection. A quick check at our clinic can prevent a small irritation from becoming a major issue.',
+    category: 'Doctor\'s Speak',
+    language: 'EN',
+    read_time: '3 min read',
+    image_url: kolkataBlog3Image,
+  },
+  {
+    id: 'kolkata-blog-4',
+    title: 'Choosing the Right Diet for Your Pet: Kolkata-Specific Tips',
+    excerpt: 'Nutrition plays a massive role in combating local health issues. Learn how to tailor your pet\'s diet for Kolkata conditions.',
+    content: 'Nutrition is the foundation of your pet\'s health, and in a climate like Kolkata\'s, it can even help mitigate certain region-specific risks. A high-quality, balanced diet supports a robust immune system and skin health, both of which are under constant pressure from local humidity and seasonal allergens.\n\nWe generally recommend premium, life-stage-appropriate commercial diets that are formulated to meet AAFCO or FEDIAF standards. If you opt for homemade diets, you MUST work with a veterinary nutritionist to ensure it\'s nutritionally complete—a common cause of severe secondary illness here is malnutrition from unbalanced home cooking. Don\'t forget to consider seasonal needs: pets might eat less in peak summer heat, requiring more energy-dense meals during cooler months, or specific formulations for pets dealing with skin issues. Always transition diets slowly over 7-10 days to avoid gastrointestinal upset.',
+    category: 'Pet News',
+    language: 'EN',
+    read_time: '4 min read',
+    image_url: kolkataBlog4Image,
+  },
+  {
     id: 'placeholder-1',
     title: 'Understanding Tick Fever Season in Kolkata',
     excerpt: 'Tick-borne diseases are on the rise this monsoon in Kolkata. Here is what pet owners need to know about prevention, early detection, and treatment to keep your pets safe and healthy.',
@@ -26,7 +71,7 @@ const PLACEHOLDER_BLOGS: BlogPost[] = [
     language: 'EN',
     read_time: '2 min read',
     is_featured: true,
-    image_url: 'https://images.unsplash.com/photo-1576201836106-db1758fd1c97?q=80&w=800&auto=format&fit=crop',
+    image_url: kolkataBlog5Image,
   },
   {
     id: 'placeholder-2',
@@ -204,7 +249,7 @@ export const StoriesPage = () => {
                     <img 
                       src={blog.image_url} 
                       alt={blog.title} 
-                      className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700"
+                      className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 rounded-t-3xl"
                       loading="lazy"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
