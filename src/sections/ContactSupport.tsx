@@ -1,5 +1,7 @@
 import { useState, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from '../services/firebase';
 
 export const ContactSupport = () => {
   const { scrollYProgress } = useScroll();
@@ -22,20 +24,13 @@ export const ContactSupport = () => {
     setStatus('loading');
     
     try {
-      const response = await fetch('/api/booking', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
+      await addDoc(collection(db, 'inquiries'), {
+        ...formData,
+        createdAt: new Date().toISOString()
       });
       
-      if (response.ok) {
-        setStatus('success');
-        setFormData({ firstName: '', lastName: '', email: '', phone: '', message: '' });
-      } else {
-        setStatus('error');
-      }
+      setStatus('success');
+      setFormData({ firstName: '', lastName: '', email: '', phone: '', message: '' });
     } catch (error) {
       console.error(error);
       setStatus('error');

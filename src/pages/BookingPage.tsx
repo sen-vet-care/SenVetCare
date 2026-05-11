@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../services/firebase';
 
 export const BookingPage = () => {
@@ -55,30 +55,37 @@ export const BookingPage = () => {
     setStatus('loading');
     
     try {
-      // API call to custom backend server which handles routing the automated email
-      const response = await fetch('/api/booking', {
+      await addDoc(collection(db, 'appointments'), {
+        ownerName: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        petDetails: formData.petDetails,
+        date: isEmergency ? new Date().toISOString() : formData.date || new Date().toISOString(),
+        time: isEmergency ? 'Immediate' : formData.time,
+        doctorId: formData.doctorId || null,
+        status: isEmergency ? 'Pending Emergency' : 'Scheduled',
+        isEmergency: isEmergency,
+        createdAt: new Date().toISOString()
+      });
+      
+      // Send notification email
+      await fetch('/api/booking', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
            firstName: formData.name,
            lastName: '',
            email: formData.email,
            phone: formData.phone,
-           message: `Booking Request: Date: ${formData.date}, Time: ${formData.time}, Pet: ${formData.petDetails}`
-        }),
+           message: `Booking Request: Date: ${isEmergency ? 'Immediate' : formData.date}, Time: ${isEmergency ? 'Immediate' : formData.time}, Pet: ${formData.petDetails}`
+        })
       });
-      
-      if (response.ok) {
-        setStatus('success');
-      } else {
-        setStatus('idle');
-        alert("Failed to submit booking. Please try again.");
-      }
+
+      setStatus('success');
     } catch (err) {
       console.error(err);
       setStatus('idle');
+      alert("Failed to submit booking. Please try again.");
     }
   };
 

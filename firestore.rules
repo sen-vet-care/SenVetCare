@@ -100,6 +100,11 @@ service cloud.firestore {
       allow delete: if true;
     }
 
+    match /inquiries/{inquiryId} {
+      allow create: if true;
+      allow get, list, update, delete: if isAdmin();
+    }
+
     match /triage_reports/{reportId} {
       allow get: if isOwner(existing().ownerId) || isAdmin() || exists(/databases/$(database)/documents/doctors/$(request.auth.uid));
       allow list: if isOwner(resource.data.ownerId) || isAdmin() || exists(/databases/$(database)/documents/doctors/$(request.auth.uid));

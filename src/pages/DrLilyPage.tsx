@@ -475,6 +475,51 @@ export const DrLilyPage = () => {
     setTriageLoading(false);
   };
 
+  const emailSentRef = useRef(false);
+
+  useEffect(() => {
+    if (step !== "result") {
+      emailSentRef.current = false;
+    }
+  }, [step]);
+
+  useEffect(() => {
+    if (step === "result" && formData.emailAddress && !emailSentRef.current) {
+      emailSentRef.current = true;
+      const sendEmail = async () => {
+        try {
+          // Wait for DOM to render the report
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          const element = document.getElementById('lily-report-content');
+          if (!element) return;
+
+          const canvas = await html2canvas(element, { scale: 2, useCORS: true, allowTaint: true });
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          const pdfBase64 = pdf.output('datauristring');
+
+          await fetch('/api/triage/email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: formData.emailAddress,
+              ownerName: formData.ownerName,
+              petName: formData.petName,
+              pdfBase64: pdfBase64
+            })
+          });
+        } catch (err) {
+          console.error("Failed to generate and email PDF report automatically", err);
+        }
+      };
+      
+      sendEmail();
+    }
+  }, [step, formData.emailAddress, formData.ownerName, formData.petName]);
+
   useEffect(() => {
     if (step === "triage" && chatContainerRef.current) {
       chatContainerRef.current.scrollTop =

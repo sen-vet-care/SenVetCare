@@ -10,7 +10,8 @@ async function startServer() {
   const PORT = 3000;
 
   app.use(cors());
-  app.use(express.json());
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
   // API Routes
   app.get("/api/health", (req, res) => {
@@ -32,15 +33,87 @@ async function startServer() {
   app.post("/api/booking", async (req, res) => {
     const { firstName, lastName, email, phone, message } = req.body;
     
-    console.log(`[BOOKING INQUIRY] to: contact@senvetcare.com`);
+    console.log(`[BOOKING INQUIRY] to: senvetcare@gmail.com & drtbsmemorialvetclinic@gmail.com`);
     console.log(`From: ${firstName} ${lastName}`);
     console.log(`Email: ${email}, Phone: ${phone}`);
     console.log(`Message: ${message}`);
     
     // In a production environment, you would use a mailer service here.
-    // For now, we simulate success.
+    if (process.env.RESEND_API_KEY) {
+      const { Resend } = await import('resend');
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      
+      try {
+        // Send to clinic
+        await resend.emails.send({
+          from: 'Sen Vet Care <onboarding@resend.dev>', // Update with verified domain in production
+          to: ['senvetcare@gmail.com', 'drtbsmemorialvetclinic@gmail.com'],
+          subject: `New Booking/Inquiry from ${firstName} ${lastName}`,
+          html: `<p><strong>Name:</strong> ${firstName} ${lastName}</p>
+                 <p><strong>Email:</strong> ${email}</p>
+                 <p><strong>Phone:</strong> ${phone}</p>
+                 <br/><p><strong>Message:</strong></p>
+                 <p>${message}</p>`
+        });
+        
+        // Confirmation to user
+        if (email) {
+          await resend.emails.send({
+            from: 'Sen Vet Care <onboarding@resend.dev>', // Update with verified domain in production
+            to: [email],
+            subject: `Confirmation: We received your inquiry - Sen Vet Care`,
+            html: `<p>Dear ${firstName},</p>
+                   <p>Thank you for reaching out to Sen Vet Care. We have received your inquiry/booking request and our clinical team will get back to you shortly.</p>
+                   <br/>
+                   <p><strong>Your Message:</strong></p>
+                   <p>${message}</p>
+                   <br/>
+                   <p>Best Regards,</p>
+                   <p>Sen Vet Care Team</p>`
+          });
+        }
+      } catch (err) {
+        console.error("Failed to send booking emails via Resend:", err);
+      }
+    }
     
     res.json({ success: true, message: "Your inquiry has been sent to our clinical team." });
+  });
+
+  // Triage Report Email
+  app.post("/api/triage/email", async (req, res) => {
+    const { email, ownerName, pdfBase64, petName } = req.body;
+    
+    if (process.env.RESEND_API_KEY && email) {
+      const { Resend } = await import('resend');
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      
+      try {
+        await resend.emails.send({
+          from: 'Sen Vet Care <onboarding@resend.dev>',
+          to: [email],
+          subject: `AI Triage Report for ${petName} - Sen Vet Care`,
+          html: `<p>Dear ${ownerName},</p>
+                 <p>Please find attached the AI Triage Report for your pet, <strong>${petName}</strong>.</p>
+                 <p>If the report indicates an emergency, please call our clinic immediately.</p>
+                 <br/>
+                 <p>Best Regards,</p>
+                 <p>Sen Vet Care Team</p>`,
+          attachments: [
+            {
+              filename: `${petName}_Triage_Report.pdf`,
+              content: pdfBase64.split('base64,')[1] || pdfBase64,
+            }
+          ]
+        });
+        res.json({ success: true });
+      } catch (err) {
+        console.error("Failed to send triage report email:", err);
+        res.status(500).json({ success: false, error: "Email delivery failed" });
+      }
+    } else {
+      res.json({ success: false, message: "RESEND_API_KEY not configured or email missing." });
+    }
   });
 
   // Set up the daily cron job (runs every day at midnight)
