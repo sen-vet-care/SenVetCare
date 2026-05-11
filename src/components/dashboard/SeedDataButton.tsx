@@ -33,11 +33,11 @@ const DEMO_PETS = [
 ];
 
 const DEMO_APPOINTMENTS = [
-  { petName: 'Buddy', ownerName: 'Alice', date: '2023-11-15', time: '10:30 AM', reason: 'Annual Checkup', status: 'Scheduled' },
-  { petName: 'Luna', ownerName: 'Bob', date: '2023-11-16', time: '11:00 AM', reason: 'Vaccination', status: 'Scheduled' },
-  { petName: 'Max', ownerName: 'Charlie', date: '2023-11-15', time: '02:00 PM', reason: 'Skin infection', status: 'Completed' },
-  { petName: 'Bella', ownerName: 'David', date: '2023-11-17', time: '04:00 PM', reason: 'Dental Check', status: 'Scheduled' },
-  { petName: 'Charlie', ownerName: 'Eve', date: '2023-11-18', time: '09:30 AM', reason: 'Limping', status: 'Scheduled' },
+  { petName: 'Buddy', ownerName: 'Alice', date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(), time: '10:30 AM', reason: 'Annual Checkup', status: 'Scheduled' },
+  { petName: 'Luna', ownerName: 'Bob', date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), time: '11:00 AM', reason: 'Vaccination', status: 'Scheduled' },
+  { petName: 'Max', ownerName: 'Charlie', date: new Date(Date.now() - 1000 * 60 * 60 * 24 * 10).toISOString(), time: '02:00 PM', reason: 'Skin infection', status: 'Completed' },
+  { petName: 'Bella', ownerName: 'David', date: new Date().toISOString(), time: '04:00 PM', reason: 'Dental Check', status: 'Scheduled' },
+  { petName: 'Charlie', ownerName: 'Eve', date: new Date(Date.now() + 1000 * 60 * 60 * 24 * 1).toISOString(), time: '09:30 AM', reason: 'Limping', status: 'Scheduled' },
 ];
 
 export const SeedDataButton = () => {

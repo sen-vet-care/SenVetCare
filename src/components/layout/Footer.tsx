@@ -157,7 +157,7 @@ export const Footer = () => {
           
           <div className="flex items-center gap-8">
             <p className="text-[10px] font-medium text-zinc-600 uppercase tracking-[0.25em]">
-              Developed with care by <a href="https://www.zoethehappiness.com" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-primary transition-colors font-bold tracking-widest lowercase">Zoe</a>
+              Developed with care by <a href="https://www.zoethehappiness.com" target="_blank" rel="noopener noreferrer" className="text-zinc-400 hover:text-primary transition-colors font-bold tracking-widest lowercase">zoe</a>
             </p>
           </div>
         </div>

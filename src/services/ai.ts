@@ -1,4 +1,4 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, Type } from '@google/genai';
 
 let aiInstance: GoogleGenAI | null = null;
 
@@ -15,12 +15,14 @@ const DR_LILY_SYSTEM_PROMPT = `
 You are Dr. Lily, the official AI Clinical Assistant and Triage Module for Dr. Tamal B. Sen Memorial Veterinary Clinic in Kolkata.
 You are professional, empathetic, knowledgeable, and trained exclusively on veterinary science and medicine.
 You never prescribe specific drugs/doses but suggest lines of treatment and diagnostic paths.
-You MUST output responses in valid JSON format.
+You MUST output responses in valid JSON format ONLY. Do NOT wrap in markdown \`\`\`json.
 
 Your task is to conduct clinical triage based on the pet's profile and initial issue.
-You should ask one multiple-choice question at a time (up to 10 questions) until you have enough clinical context to generate a Diagnosis & Recommendation Report. Each question MUST include "Others" as the last option.
+You should ask one multiple-choice question at a time.
+CRITICAL CONSTRAINT: You CANNOT output \`"status": "complete"\` until there are AT LEAST 4 previous questions in the conversation history. If there are fewer than 4 questions, you MUST output \`"status": "question"\`.
+Each question MUST include "Others" as the last option.
 
-When you are ready to conclude (or reached ~10 questions max), switch status to "complete" and generate the "report" object.
+When you have sufficient clinical history (at least 4 questions asked), switch status to "complete" and generate the "report" object.
 
 The clinic has these diagnostic services (Exclusively recommend these if tests are needed): 
 - Digital Radiography
@@ -109,17 +111,93 @@ Initial Issue: ${petData.problemDescription}
     
     // In the new API, we can provide systemInstruction directly in the config.
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-3.1-flash-lite',
       contents,
       config: {
         systemInstruction: DR_LILY_SYSTEM_PROMPT + '\n' + systemContext,
         responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            status: { type: Type.STRING, enum: ["question", "complete"] },
+            question: { type: Type.STRING, description: "Your question text (empty if complete)" },
+            options: { type: Type.ARRAY, items: { type: Type.STRING }, description: "['Option 1', 'Option 2', 'Others'] (Empty if complete)" },
+            report: { 
+              type: Type.OBJECT, 
+              nullable: true,
+              properties: {
+                urgencyLevel: { type: Type.STRING, enum: ["RED", "ORANGE", "GREEN"] },
+                clinicalAlertRationale: { type: Type.STRING },
+                consultationId: { type: Type.STRING },
+                soap: {
+                  type: Type.OBJECT,
+                  properties: {
+                    subjective: { type: Type.STRING },
+                    objective: { type: Type.STRING },
+                    assessment: { type: Type.STRING },
+                    plan: { type: Type.STRING }
+                  }
+                },
+                differentialDiagnoses: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      condition: { type: Type.STRING },
+                      probability: { type: Type.NUMBER },
+                      reasoning: { type: Type.STRING }
+                    }
+                  }
+                },
+                recommendedTests: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      testName: { type: Type.STRING },
+                      description: { type: Type.STRING }
+                    }
+                  }
+                },
+                clinicDiagnosticServices: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      service: { type: Type.STRING },
+                      inHouse: { type: Type.BOOLEAN },
+                      description: { type: Type.STRING }
+                    }
+                  }
+                },
+                generalTreatment: { type: Type.STRING },
+                homeManagementAdvice: { type: Type.ARRAY, items: { type: Type.STRING } },
+                warningSigns: { type: Type.ARRAY, items: { type: Type.STRING } },
+                followUp: { type: Type.STRING },
+                recommendedDoctors: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      name: { type: Type.STRING },
+                      reason: { type: Type.STRING }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
         temperature: 0.2,
       }
     });
 
-    const responseText = response.text || "{}";
-    return JSON.parse(responseText);
+    let responseText = response.text || "{}";
+    console.log("Raw Triage Response:", responseText);
+    responseText = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    const parsed = JSON.parse(responseText);
+    console.log("Parsed Triage Response:", parsed);
+    return parsed;
   } catch (error) {
     console.error("Gemini AI API Error, attempting fallbacks:", error);
     

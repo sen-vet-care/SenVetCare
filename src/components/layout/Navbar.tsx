@@ -95,6 +95,16 @@ export const Navbar = () => {
               </Link>
             )}
             
+            {deferredPrompt && (
+              <button 
+                onClick={handleInstall}
+                className="hidden lg:flex items-center gap-1 bg-gradient-to-r from-emerald-500 to-emerald-700 text-white px-3 py-2 md:px-4 md:py-2.5 rounded-full font-inter text-[10px] md:text-xs font-bold tracking-widest uppercase hover:brightness-110 shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all duration-500 hover:scale-105 active:scale-95 ml-2"
+              >
+                <span className="material-symbols-outlined text-[16px]">install_mobile</span>
+                Install
+              </button>
+            )}
+
             <button 
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
                 className="lg:hidden p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-full transition-colors flex items-center justify-center"
@@ -130,28 +140,34 @@ export const Navbar = () => {
                               exit={{ opacity: 0, height: 0 }}
                               className="overflow-hidden flex flex-col bg-black/20 rounded-b-xl"
                            >
-                             <Link to="/treatments" className="py-3 px-6 border-b border-white/5 hover:text-white hover:bg-white/5">Treatments</Link>
-                             <Link to="/preventions" className="py-3 px-6 border-b border-white/5 hover:text-white hover:bg-white/5">Preventions</Link>
-                             <Link to="/diagnostics" className="py-3 px-6 border-b border-white/5 hover:text-white hover:bg-white/5">Lab Tests & Diagnostics</Link>
-                             <Link to="/pharmacy" className="py-3 px-6 hover:text-white hover:bg-white/5">Pharmacy</Link>
+                              <Link to="/treatments" className={`py-3 px-6 border-b border-white/5 hover:text-white hover:bg-white/5 ${location.pathname === '/treatments' ? 'text-primary bg-white/5' : ''}`}>Treatments</Link>
+                             <Link to="/preventions" className={`py-3 px-6 border-b border-white/5 hover:text-white hover:bg-white/5 ${location.pathname === '/preventions' ? 'text-primary bg-white/5' : ''}`}>Preventions</Link>
+                             <Link to="/diagnostics" className={`py-3 px-6 border-b border-white/5 hover:text-white hover:bg-white/5 ${location.pathname === '/diagnostics' ? 'text-primary bg-white/5' : ''}`}>Lab Tests & Diagnostics</Link>
+                             <Link to="/pharmacy" className={`py-3 px-6 hover:text-white hover:bg-white/5 ${location.pathname === '/pharmacy' ? 'text-primary bg-white/5' : ''}`}>Pharmacy</Link>
                            </motion.div>
                         )}
                      </AnimatePresence>
                    </div>
                    
-                   <Link to="/dr-lily" className="py-4 text-emerald-400 border-b border-white/10 flex items-center gap-2 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]">
+                   <Link to="/dr-lily" className={`py-4 border-b border-white/10 flex items-center gap-2 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)] ${location.pathname === '/dr-lily' ? 'text-white bg-emerald-500/10 px-4 rounded-xl my-1' : 'text-emerald-400'}`}>
                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse drop-shadow-[0_0_5px_rgba(52,211,153,0.8)]"></span>
                      FREE Consultations
                    </Link>
-                   <Link to="/book?emergency=true" className="py-4 text-error border-b border-white/10 flex items-center gap-2 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]">
+                   <Link to="/book?emergency=true" className={`py-4 border-b border-white/10 flex items-center gap-2 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)] ${location.pathname === '/book' ? 'text-white bg-error/20 px-4 rounded-xl my-1' : 'text-error'}`}>
                      <span className="w-1.5 h-1.5 rounded-full bg-error animate-ping"></span>
                      Emergency
                    </Link>
-                   <Link to="/stories" className="py-4 text-white border-b border-white/10 font-serif italic lowercase tracking-normal">Stories</Link>
+                   <Link to="/stories" className={`py-4 border-b border-white/10 font-serif italic lowercase tracking-normal ${location.pathname === '/stories' ? 'text-primary bg-white/5 px-4 rounded-xl my-1' : 'text-white'}`}>Stories</Link>
+                   {deferredPrompt && (
+                     <button onClick={handleInstall} className="py-4 text-emerald-400 border-b border-white/10 text-left flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[18px]">install_mobile</span>
+                        Install SenVetCare App
+                     </button>
+                   )}
                    {user ? (
-                     <Link to="/dashboard" className="py-4 text-white">Dashboard</Link>
+                     <Link to="/dashboard" className={`py-4 ${location.pathname === '/dashboard' ? 'text-primary' : 'text-white'}`}>Dashboard</Link>
                    ) : (
-                     <Link to="/portal-login" className="py-4 text-white">Sign In</Link>
+                     <Link to="/portal-login" className={`py-4 ${location.pathname === '/portal-login' ? 'text-primary' : 'text-white'}`}>Sign In</Link>
                    )}
                 </div>
              </motion.div>

@@ -45,14 +45,41 @@ export const BookingPage = () => {
     fetchDoctors();
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isEmergency && !formData.time) {
+      alert("Please select a time slot.");
+      return;
+    }
+    
     setStatus('loading');
     
-    // Simulate API call and email trigger
-    setTimeout(() => {
-      setStatus('success');
-    }, 1500);
+    try {
+      // API call to custom backend server which handles routing the automated email
+      const response = await fetch('/api/booking', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+           firstName: formData.name,
+           lastName: '',
+           email: formData.email,
+           phone: formData.phone,
+           message: `Booking Request: Date: ${formData.date}, Time: ${formData.time}, Pet: ${formData.petDetails}`
+        }),
+      });
+      
+      if (response.ok) {
+        setStatus('success');
+      } else {
+        setStatus('idle');
+        alert("Failed to submit booking. Please try again.");
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus('idle');
+    }
   };
 
   return (
@@ -183,36 +210,42 @@ export const BookingPage = () => {
               </div>
             </div>
 
-            <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 ${isEmergency ? 'hidden' : ''}`}>
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest font-black text-on-surface-variant">Date { !isEmergency && <span className="text-error">*</span>}</label>
+            <div className={`space-y-4 ${isEmergency ? 'hidden' : ''}`}>
+              <label className="text-[10px] uppercase tracking-widest font-black text-on-surface-variant">Select Date & Time { !isEmergency && <span className="text-error">*</span>}</label>
+              <div className="bg-surface-container border border-outline-variant rounded-xl p-4 shadow-inner">
                 <input 
                   type="date"
                   required={!isEmergency}
                   min={minDate}
                   value={formData.date}
-                  onChange={(e) => setFormData({...formData, date: e.target.value})}
-                  className="w-full bg-surface-container border border-outline-variant rounded-xl py-3 px-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary transition-colors focus:ring-1 focus:ring-primary shadow-inner"
+                  onChange={(e) => setFormData({...formData, date: e.target.value, time: ''})}
+                  className="w-full bg-black/20 border border-white/10 rounded-lg py-3 px-4 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary transition-colors focus:ring-1 focus:ring-primary mb-4"
                 />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase tracking-widest font-black text-on-surface-variant">Preferred Time { !isEmergency && <span className="text-error">*</span>}</label>
-                <div className="relative">
-                  <select 
-                    required={!isEmergency}
-                    value={formData.time}
-                    onChange={(e) => setFormData({...formData, time: e.target.value})}
-                    className="w-full bg-surface-container border border-outline-variant rounded-xl py-3 px-4 pr-10 text-sm text-white focus:outline-none focus:border-primary transition-colors focus:ring-1 focus:ring-primary shadow-inner appearance-none"
-                  >
-                    <option value="" disabled>Select Time Slot</option>
-                    <option value="morning">Morning (10:00 AM - 1:00 PM)</option>
-                    <option value="afternoon">Afternoon (2:00 PM - 5:00 PM)</option>
-                    <option value="evening">Evening (6:00 PM - 8:00 PM)</option>
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-zinc-500">
-                     <span className="material-symbols-outlined text-[18px]">expand_more</span>
-                  </div>
-                </div>
+                
+                {formData.date && (
+                   <div className="grid grid-cols-3 gap-2">
+                     {(() => {
+                        // Mock availability logic based on doctorId and date
+                        const availableTimes = ['10:00 AM', '11:00 AM', '12:00 PM', '2:00 PM', '3:30 PM', '5:00 PM', '6:30 PM'];
+                        const pseudoSeed = (formData.date.charCodeAt(formData.date.length - 1) + (formData.doctorId || '1').charCodeAt(0)) % 2;
+                        const times = pseudoSeed === 0 ? availableTimes : availableTimes.slice(2, 6);
+                        
+                        return times.map(time => (
+                           <button
+                             key={time}
+                             type="button"
+                             onClick={() => setFormData({...formData, time})}
+                             className={`py-2 rounded-lg text-xs font-bold transition-all border ${formData.time === time ? 'bg-primary text-black border-primary shadow-[0_0_10px_rgba(212,175,55,0.4)]' : 'bg-black/30 border-white/10 text-zinc-400 hover:bg-white/5 hover:text-white'}`}
+                           >
+                             {time}
+                           </button>
+                        ))
+                     })()}
+                   </div>
+                )}
+                {!formData.date && (
+                  <p className="text-center text-xs text-zinc-500 italic py-4">Please select a date to view available slots.</p>
+                )}
               </div>
             </div>
 

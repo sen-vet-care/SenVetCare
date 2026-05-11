@@ -98,7 +98,7 @@ export const OurDoctors = () => {
         const querySnapshot = await getDocs(collection(db, "doctors"));
         const data = querySnapshot.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data(),
+          ...(doc.data() as any),
         }));
 
         // Deduplicate by name

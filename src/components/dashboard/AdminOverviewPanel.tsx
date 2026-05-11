@@ -13,44 +13,124 @@ export const AdminOverviewPanel = () => {
    const [loading, setLoading] = useState(true);
    const [docRankings, setDocRankings] = useState<any[]>([]);
 
+   const [chartData, setChartData] = useState<any[]>([]);
+
    useEffect(() => {
      const fetchData = async () => {
        setLoading(true);
        try {
          // Fetch patients
          const petsSnap = await getDocs(collection(db, 'pets'));
-         let patientsCount = petsSnap.size;
+         const pets = petsSnap.docs.map(doc => doc.data() as any);
+         let patientsCount = pets.length;
 
          // Fetch appointments
          const aptsSnap = await getDocs(collection(db, 'appointments'));
-         let appointmentsCount = aptsSnap.size;
+         const appointments = aptsSnap.docs.map(doc => doc.data() as any);
+         let appointmentsCount = appointments.length;
+
+         // Process dates manually because firebase queries need indexes to group effectively over client side logic inside small dbs.
+         const now = new Date();
+         const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
          
-         // Simulated filter logic for demo purposes
-         if (timeFilter === 'year') {
-            patientsCount = Math.floor(patientsCount * 4.2);
-            appointmentsCount = Math.floor(appointmentsCount * 5.1);
-         } else if (timeFilter === 'week') {
-            patientsCount = Math.floor(Math.max(patientsCount * 0.25, 1));
-            appointmentsCount = Math.floor(Math.max(appointmentsCount * 0.25, 1));
+         // Create last 6 months buckets
+         const last6Months = [];
+         for (let i = 5; i >= 0; i--) {
+            const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+            last6Months.push({
+               monthIdx: d.getMonth(),
+               year: d.getFullYear(),
+               name: monthNames[d.getMonth()],
+               appointments: 0,
+               income: 0,
+            });
          }
 
-         let totalRevenue = appointmentsCount * 800;
+         let totalRevenue = 0;
+         let periodPatients = 0;
+         let periodAppointments = 0;
+
+         appointments.forEach(apt => {
+            const dateStr = apt.date || apt.createdAt; // Handle different date formats or missing
+            if (!dateStr) return;
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return;
+
+            // Chart data
+            const bucket = last6Months.find(b => b.monthIdx === d.getMonth() && b.year === d.getFullYear());
+            if (bucket) {
+               bucket.appointments += 1;
+               // Estimate 800 per appointment as default revenue
+               bucket.income += 800;
+            }
+
+            // Stats Filter Logic
+            const timeDiff = now.getTime() - d.getTime();
+            const daysDiff = timeDiff / (1000 * 3600 * 24);
+            
+            let includeInStats = false;
+            if (timeFilter === 'year' && daysDiff <= 365) includeInStats = true;
+            else if (timeFilter === 'month' && daysDiff <= 30) includeInStats = true;
+            else if (timeFilter === 'week' && daysDiff <= 7) includeInStats = true;
+
+            if (includeInStats) {
+               periodAppointments += 1;
+               totalRevenue += 800; // Estimated 800 per appointment
+            }
+         });
+
+         pets.forEach(pet => {
+            const dateStr = pet.createdAt;
+            if (!dateStr) return;
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return;
+
+            const timeDiff = now.getTime() - d.getTime();
+            const daysDiff = timeDiff / (1000 * 3600 * 24);
+            
+            let includeInStats = false;
+            if (timeFilter === 'year' && daysDiff <= 365) includeInStats = true;
+            else if (timeFilter === 'month' && daysDiff <= 30) includeInStats = true;
+            else if (timeFilter === 'week' && daysDiff <= 7) includeInStats = true;
+
+            if (includeInStats) {
+               periodPatients += 1;
+            }
+         });
+
+         setChartData(last6Months);
 
          // Fetch doctors
          const docsSnap = await getDocs(collection(db, 'doctors'));
          const doctors = docsSnap.docs.map(d => ({ id: d.id, ...d.data() } as any));
          
-         // Mock rankings
-         const multiplier = timeFilter === 'year' ? 4 : timeFilter === 'week' ? 0.25 : 1;
-         const rankings = doctors.slice(0, 3).map((d, i) => ({
-             name: d.name,
-             score: 90 + Math.floor(Math.random() * 10) + "/100",
-             revenue: "₹" + ((2 + Math.random() * 2) * multiplier).toFixed(1) + "L",
-             rating: (4.5 + Math.random() * 0.5).toFixed(1)
-         }));
+         // Try checking medical records to tie revenue to doctors (demo realism)
+         const recordsSnap = await getDocs(collection(db, 'medical_records'));
+         const records = recordsSnap.docs.map(d => d.data() as any);
+
+         const doctorStats: Record<string, number> = {};
+         records.forEach(r => {
+            if (r.doctorName) {
+               doctorStats[r.doctorName] = (doctorStats[r.doctorName] || 0) + 1;
+            }
+         });
+         
+         // Rank doctors by actual records, fallback to random if none
+         const rankings = doctors.map(d => {
+             const recordCount = doctorStats[d.name] || 0;
+             const baseRevenue = recordCount * 1200; // Assuming 1200 avg per record
+             const rankIncome = baseRevenue > 0 ? (baseRevenue / 100000).toFixed(2) : ((2 + Math.random() * 2)).toFixed(1);
+             return {
+                 name: d.name,
+                 score: recordCount > 0 ? (85 + Math.min(recordCount * 2, 14)) + "/100" : (90 + Math.floor(Math.random() * 10)) + "/100",
+                 revenue: "₹" + rankIncome + "L",
+                 rating: (4.5 + Math.random() * 0.5).toFixed(1),
+                 count: recordCount
+             };
+         }).sort((a, b) => b.count - a.count).slice(0, 3);
 
          setDocRankings(rankings);
-         setStats({ patients: patientsCount, appointments: appointmentsCount, revenue: totalRevenue });
+         setStats({ patients: periodPatients, appointments: periodAppointments, revenue: totalRevenue });
        } catch(e) {
          console.error("Error fetching overview data", e);
        } finally {
@@ -59,15 +139,6 @@ export const AdminOverviewPanel = () => {
      };
      fetchData();
    }, [timeFilter]);
-
-   const chartData = [
-     { name: 'Jan', appointments: Math.floor(stats.appointments * 0.1) || 4, income: stats.revenue * 0.1 },
-     { name: 'Feb', appointments: Math.floor(stats.appointments * 0.15) || 5, income: stats.revenue * 0.15 },
-     { name: 'Mar', appointments: Math.floor(stats.appointments * 0.12) || 4, income: stats.revenue * 0.12 },
-     { name: 'Apr', appointments: Math.floor(stats.appointments * 0.2) || 7, income: stats.revenue * 0.2 },
-     { name: 'May', appointments: Math.floor(stats.appointments * 0.18) || 6, income: stats.revenue * 0.18 },
-     { name: 'Jun', appointments: Math.floor(stats.appointments * 0.25) || 12, income: stats.revenue * 0.25 },
-   ];
 
    return (
       <div className="space-y-6">

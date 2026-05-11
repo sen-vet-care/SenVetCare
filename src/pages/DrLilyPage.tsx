@@ -3,8 +3,10 @@ import { motion, AnimatePresence } from "motion/react";
 import { Link } from "react-router-dom";
 import { getTriageNextStep } from "../services/ai";
 import { auth, db } from "../services/firebase";
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs } from "firebase/firestore";
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 const SPECIES = [
   { id: "Dog / Canine", name: "Dog", icon: "pets" },
@@ -118,6 +120,37 @@ export const DrLilyPage = () => {
     window.scrollTo(0, 0);
   }, [step]);
 
+  const [currentUser, setCurrentUser] = useState(auth.currentUser);
+  const [userPets, setUserPets] = useState<any[]>([]);
+  const [loadingPets, setLoadingPets] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setCurrentUser(user);
+      if (user) {
+        const userEmail = user.email?.toLowerCase() || "";
+        const ownerName = user.displayName || userEmail.split("@")[0] || "";
+        updateFormData("ownerName", ownerName);
+        updateFormData("emailAddress", userEmail);
+        
+        setLoadingPets(true);
+        try {
+          const q = query(collection(db, "pets"), where("ownerId", "==", user.uid));
+          const snapshot = await getDocs(q);
+          const petsData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+          setUserPets(petsData);
+        } catch (e) {
+          console.error("Failed to load user pets:", e);
+        } finally {
+          setLoadingPets(false);
+        }
+      } else {
+        setUserPets([]);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
   const calculateAgeFromDOB = (
     dobString: string,
     unit: "years" | "months" | "days",
@@ -179,6 +212,33 @@ export const DrLilyPage = () => {
     setFormData((prev) => ({ ...prev, ageUnit: unit, age }));
   };
 
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById('lily-report-content');
+    if (!element) return;
+    
+    try {
+      const canvas = await html2canvas(element, { 
+        scale: 2,
+        useCORS: true,
+        allowTaint: true
+      });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Triage_Report_${reportData?.consultationId || 'Lily'}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF', error);
+    }
+  };
+
   const [triageHistory, setTriageHistory] = useState<Message[]>([]);
   const [currentQuestion, setCurrentQuestion] = useState<any>(null);
   const [triageLoading, setTriageLoading] = useState(false);
@@ -191,29 +251,6 @@ export const DrLilyPage = () => {
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
   const [isAuthenticating, setIsAuthenticating] = useState(false);
-
-  // Mock registered pets
-  const mockPets = [
-    {
-      id: "1",
-      name: "Max",
-      species: "Dog / Canine",
-      breed: "Golden Retriever",
-      sex: "Male",
-      age: "3 years",
-      weight: "30",
-      vaccinations: ["DHPPiL", "Rabies"],
-    },
-    {
-      id: "2",
-      name: "Luna",
-      species: "Cat / Feline",
-      breed: "Persian",
-      sex: "Female",
-      age: "2 years",
-      weight: "4",
-    },
-  ];
 
   const handleGoogleAuth = async () => {
     setIsAuthenticating(true);
@@ -259,14 +296,14 @@ export const DrLilyPage = () => {
     }
   };
 
-  const handleSelectMockPet = (pet: (typeof mockPets)[0]) => {
+  const handleSelectPet = (pet: any) => {
     setFormData((prev) => ({
       ...prev,
       petName: pet.name,
       species: pet.species,
       breed: pet.breed,
       sex: pet.sex,
-      age: pet.age,
+      age: pet.age || calculateAgeFromDOB(pet.dob, "years"),
       weight: pet.weight,
       vaccinations: pet.vaccinations || [],
     }));
@@ -331,10 +368,15 @@ export const DrLilyPage = () => {
       ];
       setTriageHistory(initialHistory);
       const res = await getTriageNextStep(formData, initialHistory);
-      if (res.status === "question" && res.question) {
-        setCurrentQuestion(res);
+      const resStatus = res.status?.toLowerCase() || '';
+
+      if ((resStatus === "question" || res.question) && !res.report) {
+        setCurrentQuestion({
+          question: res.question || "Can you provide any additional details?",
+          options: res.options && res.options.length > 0 ? res.options : ["Yes", "No", "Others"]
+        });
         setStep("triage");
-      } else if ((res.status === "complete" && res.report) || res.report) {
+      } else if (resStatus === "complete" || res.report) {
         setReportData(res.report);
         saveReport(res.report);
         setStep("result");
@@ -386,9 +428,14 @@ export const DrLilyPage = () => {
 
     try {
       const res = await getTriageNextStep(formData, newHistory);
-      if (res.status === "question" && res.question) {
-        setCurrentQuestion(res);
-      } else if (res.status === "complete" || res.report) {
+      const resStatus = res.status?.toLowerCase() || '';
+      
+      if ((resStatus === "question" || res.question) && !res.report) {
+        setCurrentQuestion({
+          question: res.question || "Can you provide any additional details?",
+          options: res.options && res.options.length > 0 ? res.options : ["Yes", "No", "Others"]
+        });
+      } else if (resStatus === "complete" || res.report) {
         setReportData(res.report);
         saveReport(res.report);
         setStep("result");
@@ -398,7 +445,8 @@ export const DrLilyPage = () => {
           res.report?.consultationId,
         );
       } else {
-        throw new Error("Invalid response format");
+        console.error("Unknown response format:", res);
+        throw new Error("Invalid response format: " + JSON.stringify(res));
       }
     } catch (err) {
       console.error(err);
@@ -507,48 +555,59 @@ export const DrLilyPage = () => {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-                  <button
-                    onClick={() => setStep("pet-details")}
-                    className="bg-[#6EE7B7] text-[#0D0D0F] hover:bg-[#4ADBA0] transition-colors py-4 px-8 rounded-full font-bold uppercase tracking-widest text-xs"
-                  >
-                    Create New Profile
-                  </button>
-                  <button
-                    onClick={handleGoogleAuth}
-                    disabled={isAuthenticating}
-                    className="bg-[#1C1C22] text-[#F2F2F4] border border-[#2A2A35] hover:border-[#606070] transition-colors py-4 px-8 rounded-full font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2 disabled:opacity-50"
-                  >
-                    {isAuthenticating ? (
-                      <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
-                    ) : (
-                      <>
-                        <svg
-                          className="w-4 h-4"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                            fill="#4285F4"
-                          />
-                          <path
-                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                            fill="#34A853"
-                          />
-                          <path
-                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                            fill="#FBBC05"
-                          />
-                          <path
-                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                            fill="#EA4335"
-                          />
-                        </svg>
-                        Login to continue
-                      </>
-                    )}
-                  </button>
+                  {currentUser ? (
+                    <button
+                      onClick={() => setStep("select-pet")}
+                      className="bg-[#6EE7B7] text-[#0D0D0F] hover:bg-[#4ADBA0] transition-colors py-4 px-8 rounded-full font-bold uppercase tracking-widest text-xs"
+                    >
+                      Start Triage Session
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => setStep("pet-details")}
+                        className="bg-[#6EE7B7] text-[#0D0D0F] hover:bg-[#4ADBA0] transition-colors py-4 px-8 rounded-full font-bold uppercase tracking-widest text-xs"
+                      >
+                        Create New Profile
+                      </button>
+                      <button
+                        onClick={handleGoogleAuth}
+                        disabled={isAuthenticating}
+                        className="bg-[#1C1C22] text-[#F2F2F4] border border-[#2A2A35] hover:border-[#606070] transition-colors py-4 px-8 rounded-full font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2 disabled:opacity-50"
+                      >
+                        {isAuthenticating ? (
+                          <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                        ) : (
+                          <>
+                            <svg
+                              className="w-4 h-4"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                                fill="#4285F4"
+                              />
+                              <path
+                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                                fill="#34A853"
+                              />
+                              <path
+                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                                fill="#FBBC05"
+                              />
+                              <path
+                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                                fill="#EA4335"
+                              />
+                            </svg>
+                            Login to continue
+                          </>
+                        )}
+                      </button>
+                    </>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -581,30 +640,41 @@ export const DrLilyPage = () => {
                 </p>
 
                 <div className="grid gap-4 mb-8">
-                  {mockPets.map((pet) => (
-                    <button
-                      key={pet.id}
-                      onClick={() => handleSelectMockPet(pet)}
-                      className="bg-[#1C1C22] border border-[#2A2A35] p-6 rounded-[2rem] hover:border-[#6EE7B7]/50 hover:bg-[#2A2A35]/50 transition-all text-left flex items-center gap-6 group"
-                    >
-                      <div className="w-14 h-14 rounded-full bg-[#2A2A35] flex items-center justify-center group-hover:bg-[#6EE7B7]/20 transition-colors text-white group-hover:text-[#6EE7B7]">
-                        <span className="material-symbols-outlined text-3xl">
-                          pets
+                  {loadingPets ? (
+                    <div className="flex items-center justify-center p-8 bg-[#1C1C22] border border-[#2A2A35] rounded-[2rem]">
+                      <span className="w-6 h-6 border-2 border-white/20 border-t-[#6EE7B7] rounded-full animate-spin"></span>
+                    </div>
+                  ) : userPets.length > 0 ? (
+                    userPets.map((pet) => (
+                      <button
+                        key={pet.id}
+                        onClick={() => handleSelectPet(pet)}
+                        className="bg-[#1C1C22] border border-[#2A2A35] p-6 rounded-[2rem] hover:border-[#6EE7B7]/50 hover:bg-[#2A2A35]/50 transition-all text-left flex items-center gap-6 group"
+                      >
+                        <div className="w-14 h-14 rounded-full bg-[#2A2A35] flex items-center justify-center group-hover:bg-[#6EE7B7]/20 transition-colors text-white group-hover:text-[#6EE7B7]">
+                          <span className="material-symbols-outlined text-3xl">
+                            pets
+                          </span>
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-manrope font-bold text-xl text-white mb-1">
+                            {pet.name}
+                          </h3>
+                          <p className="text-[#A0A0B0] text-sm">
+                            {pet.breed} • {pet.age || calculateAgeFromDOB(pet.dob, "years") + " years"}
+                          </p>
+                        </div>
+                        <span className="material-symbols-outlined text-[#606070] group-hover:text-[#6EE7B7] transition-colors">
+                          chevron_right
                         </span>
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-manrope font-bold text-xl text-white mb-1">
-                          {pet.name}
-                        </h3>
-                        <p className="text-[#A0A0B0] text-sm">
-                          {pet.breed} • {pet.age}
-                        </p>
-                      </div>
-                      <span className="material-symbols-outlined text-[#606070] group-hover:text-[#6EE7B7] transition-colors">
-                        chevron_right
-                      </span>
-                    </button>
-                  ))}
+                      </button>
+                    ))
+                  ) : (
+                    <div className="text-center p-8 bg-[#1C1C22] border border-[#2A2A35] rounded-[2rem]">
+                      <span className="material-symbols-outlined text-[#A0A0B0] text-4xl mb-4">pets</span>
+                      <p className="text-[#A0A0B0]">No pets found. Register a new pet to begin.</p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="text-center">
@@ -1161,14 +1231,30 @@ export const DrLilyPage = () => {
     animate={{ opacity: 1 }}
     className="w-full min-h-screen bg-zinc-100 pb-24 flex flex-col items-center"
   >
-    <div className="w-full flex justify-center py-12 px-2 sm:px-6 overflow-x-auto">
+    <div className="w-full flex flex-col items-center py-12 px-2 sm:px-6 overflow-x-auto">
+      <div className="w-full max-w-[794px] mb-4 flex justify-end">
+        <button 
+          onClick={handleDownloadPDF} 
+          className="bg-zinc-900 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg flex items-center gap-2 hover:bg-zinc-800 transition"
+        >
+          <span className="material-symbols-outlined text-[18px]">download</span>
+          Download PDF
+        </button>
+      </div>
       <div
         id="lily-report-content"
-        className="w-full max-w-[794px] bg-white text-zinc-900 shadow-2xl p-8 sm:p-12 mb-8 relative flex flex-col"
+        className="w-full max-w-[794px] bg-white text-zinc-900 shadow-2xl p-8 sm:p-12 mb-8 relative flex flex-col overflow-hidden"
         style={{ minHeight: '1123px' }}
       >
-        {/* Header - Clinic Info */}
-        <div className="flex border-b-2 border-emerald-800 pb-8 mb-8 items-start">
+        {/* Watermark Logo */}
+        <div className="absolute inset-0 z-0 flex items-center justify-center opacity-[0.03] pointer-events-none">
+          <img src="https://ik.imagekit.io/senvetcare/Logo/Logo%20Trans.webp" alt="Watermark" className="w-[500px] h-[500px] object-contain" />
+        </div>
+        
+        {/* Content Content wrapper to put above watermark */}
+        <div className="relative z-10 flex flex-col h-full flex-1">
+          {/* Header - Clinic Info */}
+          <div className="flex border-b-2 border-emerald-800 pb-8 mb-8 items-start">
             <div className="flex-1">
                 <h1 className="font-serif font-black text-4xl text-emerald-900 leading-tight">Sen Vet Care</h1>
                 <p className="text-sm font-bold text-emerald-900/70 uppercase tracking-widest leading-snug">Legacy Dr. T. B. Sen Memorial Veterinary Clinic</p>
@@ -1251,6 +1337,7 @@ export const DrLilyPage = () => {
                 It is not a substitute for a physical consultation. Decisions based on this report are at the discretion of the veterinary practitioner. This is an AI-generated document.
             </p>
             <p className="text-center text-xs text-zinc-400 mt-4 font-mono">Page 1 of 1</p>
+        </div>
         </div>
       </div>
     </div>
