@@ -6,7 +6,7 @@ import { auth, db } from "../services/firebase";
 import { signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp, collection, query, where, getDocs } from "firebase/firestore";
 import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 
 const SPECIES = [
   { id: "Dog / Canine", name: "Dog", icon: "pets" },
@@ -220,7 +220,7 @@ export const DrLilyPage = () => {
       const canvas = await html2canvas(element, { 
         scale: 2,
         useCORS: true,
-        allowTaint: true
+        allowTaint: false
       });
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF({
@@ -370,13 +370,13 @@ export const DrLilyPage = () => {
       const res = await getTriageNextStep(formData, initialHistory);
       const resStatus = res.status?.toLowerCase() || '';
 
-      if ((resStatus === "question" || res.question) && !res.report) {
+      if (resStatus === "question" && !res.report) {
         setCurrentQuestion({
           question: res.question || "Can you provide any additional details?",
           options: res.options && res.options.length > 0 ? res.options : ["Yes", "No", "Others"]
         });
         setStep("triage");
-      } else if (resStatus === "complete" || res.report) {
+      } else if (resStatus === "complete" && res.report) {
         setReportData(res.report);
         saveReport(res.report);
         setStep("result");
@@ -430,12 +430,12 @@ export const DrLilyPage = () => {
       const res = await getTriageNextStep(formData, newHistory);
       const resStatus = res.status?.toLowerCase() || '';
       
-      if ((resStatus === "question" || res.question) && !res.report) {
+      if (resStatus === "question" && !res.report) {
         setCurrentQuestion({
           question: res.question || "Can you provide any additional details?",
           options: res.options && res.options.length > 0 ? res.options : ["Yes", "No", "Others"]
         });
-      } else if (resStatus === "complete" || res.report) {
+      } else if (resStatus === "complete" && res.report) {
         setReportData(res.report);
         saveReport(res.report);
         setStep("result");
@@ -459,8 +459,13 @@ export const DrLilyPage = () => {
         setReportData({
           urgencyLevel: "ORANGE",
           consultationId: `LILY-${Date.now()}`,
-          summary:
-            "Error during live evaluation. Please consult a vet immediately.",
+          clinicalAlertRationale: "Error during live evaluation. Please consult a vet immediately.",
+          soap: {
+            subjective: "N/A",
+            objective: "N/A",
+            assessment: "Error during live evaluation. Immediate physical examination is highly recommended due to incomplete triage.",
+            plan: "Please contact the clinic directly."
+          },
           differentialDiagnoses: [],
           recommendedTests: [],
           clinicDiagnosticServices: [],
@@ -493,7 +498,7 @@ export const DrLilyPage = () => {
           const element = document.getElementById('lily-report-content');
           if (!element) return;
 
-          const canvas = await html2canvas(element, { scale: 2, useCORS: true, allowTaint: true });
+          const canvas = await html2canvas(element, { scale: 2, useCORS: true, allowTaint: false });
           const imgData = canvas.toDataURL('image/png');
           const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
           const pdfWidth = pdf.internal.pageSize.getWidth();

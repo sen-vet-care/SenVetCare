@@ -115,19 +115,19 @@ export const AdminOverviewPanel = () => {
             }
          });
          
-         // Rank doctors by actual records, fallback to random if none
-         const rankings = doctors.map(d => {
-             const recordCount = doctorStats[d.name] || 0;
-             const baseRevenue = recordCount * 1200; // Assuming 1200 avg per record
-             const rankIncome = baseRevenue > 0 ? (baseRevenue / 100000).toFixed(2) : ((2 + Math.random() * 2)).toFixed(1);
-             return {
-                 name: d.name,
-                 score: recordCount > 0 ? (85 + Math.min(recordCount * 2, 14)) + "/100" : (90 + Math.floor(Math.random() * 10)) + "/100",
-                 revenue: "₹" + rankIncome + "L",
-                 rating: (4.5 + Math.random() * 0.5).toFixed(1),
-                 count: recordCount
-             };
-         }).sort((a, b) => b.count - a.count).slice(0, 3);
+         // Rank doctors by actual records only
+         const rankings = doctors
+           .map(d => {
+              const recordCount = doctorStats[d.name] || 0;
+              const revenue = recordCount * 800; // estimated 800 per record
+              return {
+                  name: d.name,
+                  count: recordCount,
+                  revenueText: `₹${revenue.toLocaleString()}`
+              };
+          })
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 3);
 
          setDocRankings(rankings);
          setStats({ patients: periodPatients, appointments: periodAppointments, revenue: totalRevenue });
@@ -229,14 +229,15 @@ export const AdminOverviewPanel = () => {
                                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${i === 0 ? 'bg-amber-100 text-amber-700' : 'bg-surface-container-high text-on-surface-variant'}`}>
                                     {i + 1}
                                  </div>
-                                 <div>
-                                    <p className="font-bold text-ink-depth text-sm whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px]">{doc.name}</p>
+                                 <div className="flex-1 min-w-0">
+                                    <p className="font-bold text-ink-depth text-sm whitespace-nowrap overflow-hidden text-ellipsis">{doc.name}</p>
                                     <p className="text-[10px] text-on-surface-variant flex items-center gap-1 font-bold">
-                                       <span className="text-amber-500">★</span> {doc.rating}
+                                       <span className="material-symbols-outlined text-[12px] text-primary">medical_services</span>
+                                       {doc.count} Cases
                                     </p>
                                  </div>
                               </div>
-                              <span className="font-bold text-emerald-600 text-sm">{doc.revenue}</span>
+                              <span className="font-bold text-emerald-600 text-sm whitespace-nowrap ml-2">{doc.revenueText}</span>
                            </div>
                         )) : (
                             <div className="text-sm text-on-surface-variant py-4 text-center">Add doctors to view rankings.</div>

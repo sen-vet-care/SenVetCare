@@ -82,6 +82,40 @@ const DoctorCard = ({ doc, idx }: { doc: any; idx: number }) => {
   );
 };
 
+const HARDCODED_SCHEDULE = [
+  { doc: "Dr Das", day: "Monday", shift: "Morning", time: "11:30am - 2:30pm" },
+  { doc: "Dr Bala", day: "Monday", shift: "Afternoon", time: "3:00pm - 5:00pm" },
+  { doc: "Dr Sen + Dr Halder", day: "Monday", shift: "Evening", time: "6:30pm - 9:00pm" },
+  { doc: "Dr Halder", day: "Monday", shift: "Emergency", time: "11:30pm - 6:00am" },
+  { doc: "Dr Karim", day: "Tuesday", shift: "Morning", time: "11:30am - 2:30pm" },
+  { doc: "-", day: "Tuesday", shift: "Afternoon", time: "3:00pm - 5:00pm" },
+  { doc: "Dr Majie", day: "Tuesday", shift: "Evening", time: "7:00pm - 9:00pm" },
+  { doc: "Dr Hossen", day: "Tuesday", shift: "Emergency", time: "11:30pm - 6:00am" },
+  { doc: "Dr Das", day: "Wednesday", shift: "Morning", time: "11:30am - 2:30pm" },
+  { doc: "Dr Shivangi", day: "Wednesday", shift: "Afternoon", time: "3:00pm - 5:00pm" },
+  { doc: "Dr Sen + Dr Halder", day: "Wednesday", shift: "Evening", time: "6:30pm - 9:00pm" },
+  { doc: "Dr Halder", day: "Wednesday", shift: "Emergency", time: "11:30pm - 6:00am" },
+  { doc: "Dr Tofi Mondol", day: "Thursday", shift: "Morning", time: "11:30am - 2:30pm" },
+  { doc: "Dr Bala", day: "Thursday", shift: "Afternoon", time: "3:00pm - 5:00pm" },
+  { doc: "Dr Shome", day: "Thursday", shift: "Evening", time: "6:00pm - 7:30pm" },
+  { doc: "Dr Roy", day: "Thursday", shift: "Evening", time: "7:30pm - 9:00pm" },
+  { doc: "Dr Pallab Mondol", day: "Thursday", shift: "Emergency", time: "11:30pm - 6:00am" },
+  { doc: "Dr Pallab Mondol", day: "Friday", shift: "Morning", time: "11:30am - 2:30pm" },
+  { doc: "Dr Shivangi", day: "Friday", shift: "Afternoon", time: "3:00pm - 5:00pm" },
+  { doc: "Dr Sen + Dr Tofi Mondol", day: "Friday", shift: "Evening", time: "6:30pm - 9:00pm" },
+  { doc: "Dr Halder", day: "Friday", shift: "Emergency", time: "11:30pm - 6:00am" },
+  { doc: "Dr Karim", day: "Saturday", shift: "Morning", time: "11:30am - 2:30pm" },
+  { doc: "-", day: "Saturday", shift: "Afternoon", time: "3:00pm - 5:00pm" },
+  { doc: "Dr Shome", day: "Saturday", shift: "Evening", time: "6:00pm - 7:30pm" },
+  { doc: "Dr Majie", day: "Saturday", shift: "Evening", time: "7:30pm - 9:00pm" },
+  { doc: "Dr Shamim", day: "Saturday", shift: "Emergency", time: "11:30pm - 6:00am" },
+  { doc: "Dr Murthy", day: "Sunday", shift: "Morning", time: "11:30am - 2:30pm" },
+  { doc: "Dr Shivangi", day: "Sunday", shift: "Afternoon", time: "3:00pm - 5:00pm" },
+  { doc: "Dr Karim", day: "Sunday", shift: "Evening", time: "6:00pm - 7:00pm" },
+  { doc: "Dr Roy", day: "Sunday", shift: "Evening", time: "7:30pm - 9:00pm" },
+  { doc: "Dr Hossen", day: "Sunday", shift: "Emergency", time: "11:30pm - 6:00am" },
+];
+
 export const OurDoctors = () => {
   const [doctors, setDoctors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -259,50 +293,42 @@ export const OurDoctors = () => {
             Clinic Schedule
           </h2>
           <div className="w-full overflow-x-auto">
-            {!loading && scheduleByDay.length > 0 ? (
-              <table className="w-full border-collapse border-2 border-emerald-600 bg-white shadow-sm font-sans">
-                <thead>
-                  <tr>
-                    <th className="border-2 border-emerald-600 p-3 text-emerald-600 font-bold text-sm tracking-wide text-center w-[40%]">
-                      DOCTOR'S NAME
-                    </th>
-                    <th className="border-2 border-emerald-600 p-3 text-emerald-600 font-bold text-sm tracking-wide text-center w-[30%]">
-                      SCHEDULE
-                    </th>
-                    <th className="border-2 border-emerald-600 p-3 text-emerald-600 font-bold text-sm tracking-wide text-center w-[30%]">
-                      TIME
-                    </th>
+            <table className="w-full border-collapse border-2 border-emerald-600 bg-white shadow-sm font-sans min-w-[700px]">
+              <thead>
+                <tr>
+                  <th className="border-2 border-emerald-600 p-3 text-emerald-600 font-bold text-sm tracking-wide text-left w-[30%]">
+                    DOCTOR
+                  </th>
+                  <th className="border-2 border-emerald-600 p-3 text-emerald-600 font-bold text-sm tracking-wide text-left w-[20%]">
+                    DAY
+                  </th>
+                  <th className="border-2 border-emerald-600 p-3 text-emerald-600 font-bold text-sm tracking-wide text-left w-[20%]">
+                    SHIFT
+                  </th>
+                  <th className="border-2 border-emerald-600 p-3 text-emerald-600 font-bold text-sm tracking-wide text-left w-[30%]">
+                    TIME
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {HARDCODED_SCHEDULE.map((row, idx) => (
+                  <tr key={idx} className="hover:bg-emerald-50 transition-colors">
+                    <td className="border-2 border-emerald-600 p-3 text-gray-800 text-sm align-middle">
+                      {row.doc}
+                    </td>
+                    <td className="border-2 border-emerald-600 p-3 text-gray-800 text-sm font-medium align-middle">
+                      {row.day}
+                    </td>
+                    <td className="border-2 border-emerald-600 p-3 text-gray-800 text-sm align-middle">
+                      {row.shift}
+                    </td>
+                    <td className="border-2 border-emerald-600 p-3 text-gray-800 text-sm align-middle">
+                      {row.time}
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {scheduleByDay.map((dayData, dayIdx) => (
-                    <tr key={dayIdx}>
-                      <td className="border-2 border-emerald-600 p-3 text-gray-800 text-sm align-middle">
-                        <div className="flex flex-col gap-1 items-center">
-                          {dayData.slots.map((slot, i) => (
-                            <span key={i}>{slot.docName}</span>
-                          ))}
-                        </div>
-                      </td>
-                      <td className="border-2 border-emerald-600 p-3 text-gray-800 text-sm font-medium text-center align-middle">
-                        {dayData.day}
-                      </td>
-                      <td className="border-2 border-emerald-600 p-3 text-gray-800 text-sm align-middle text-center">
-                        <div className="flex flex-col gap-1 items-center">
-                          {dayData.slots.map((slot, i) => (
-                            <span key={i}>{slot.time}</span>
-                          ))}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <div className="p-8 text-center text-on-surface-variant bg-surface-container rounded-xl">
-                No schedule data available.
-              </div>
-            )}
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
